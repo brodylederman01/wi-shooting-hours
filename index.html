@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WI Deer Hunting Shooting Hours</title>
 
-  <!-- Leaflet map CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <!-- No Leaflet CSS needed with Google Maps -->
 
   <style>
     /* ====== GLOBAL LAYOUT & THEME ====== */
@@ -172,8 +168,7 @@
       background: radial-gradient(circle at top, #0b1120, #020617);
       border: 1px solid rgba(148,163,184,0.4);
       box-shadow: 0 16px 44px rgba(0,0,0,0.9);
-      /* helps when scrolling into view under sticky header */
-      scroll-margin-top: 90px;
+      scroll-margin-top: 90px; /* helps when scrolling into view under sticky header */
     }
     .result-header {
       display: flex;
@@ -249,32 +244,10 @@
       margin-top: 4px;
     }
 
-    /* ====== AUTOCOMPLETE SUGGESTIONS ====== */
+    /* ====== AUTOCOMPLETE WRAPPER (no custom dropdown now) ====== */
     .suggestions {
       position: relative;
       width: 100%;
-    }
-    .suggestions-list {
-      position: absolute;
-      z-index: 30;
-      left: 0;
-      right: 0;
-      top: calc(100% + 2px);
-      max-height: 260px;
-      overflow-y: auto;
-      background: #020617;
-      border-radius: 10px;
-      box-shadow: 0 14px 38px rgba(0,0,0,0.9);
-      border: 1px solid #1f2937;
-    }
-    .suggestion-item {
-      padding: 6px 9px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      color: #e5e7eb;
-    }
-    .suggestion-item:hover {
-      background: #111827;
     }
 
     /* ====== FOOTER ====== */
@@ -329,7 +302,7 @@
         <button id="btnUseLocation">📍 Use My Location</button>
       </div>
 
-      <!-- SEARCH BY CITY / ZIP / ADDRESS with AUTOCOMPLETE -->
+      <!-- SEARCH BY CITY / ZIP / ADDRESS with GOOGLE PLACES AUTOCOMPLETE -->
       <label for="locationInput">City / ZIP / Address (in Wisconsin)</label>
       <div class="row-inline suggestions">
         <input
@@ -338,9 +311,8 @@
           placeholder="Start typing a WI city or town (e.g. Eau Claire, Madison)…"
           style="flex:1; min-width: 180px;"
         />
-        <!-- Renamed button to "Go" -->
+        <!-- "Go" button triggers a Places query if user doesn't pick from dropdown -->
         <button id="btnSearchLocation" class="secondary small">Go</button>
-        <div id="locationSuggestions" class="suggestions-list" style="display:none;"></div>
       </div>
 
       <!-- MAP PICKER -->
@@ -373,9 +345,6 @@
       Built for hunters to quickly check today’s hours at <span class="footer-domain">WIHuntingHours.com</span>.
     </div>
   </footer>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
     // -----------------------
@@ -428,6 +397,8 @@
 
     let map = null;
     let mapMarker = null;
+    let autocomplete = null;
+    let placesService = null;
 
     window.userLat = null;
     window.userLon = null;
@@ -438,11 +409,10 @@
       btnSearchLocation: document.getElementById('btnSearchLocation'),
       countySelect: document.getElementById('countySelect'),
       dateInput: document.getElementById('dateInput'),
-      result: document.getElementById('result'),
-      locationSuggestions: document.getElementById('locationSuggestions')
+      result: document.getElementById('result')
     };
 
-    let suggestionTimeout = null;
+    let suggestionTimeout = null; // leftover var, not used now but harmless
 
     // -----------------------
     //  UTILITIES
@@ -523,7 +493,6 @@
       let suffix = 'AM';
 
       if (forcePm) {
-        // Always show as PM for ending time
         if (h === 0) {
           h = 12;
           suffix = 'PM';
@@ -533,11 +502,9 @@
           h = h - 12;
           suffix = 'PM';
         } else {
-          // 1–11 -> same hour, PM
           suffix = 'PM';
         }
       } else {
-        // Normal inference for start time
         if (h === 0) {
           h = 12;
           suffix = 'AM';
@@ -697,7 +664,6 @@
         </div>
       `;
 
-      // Automatically scroll to results (helps mobile users)
       scrollToResult();
     }
 
@@ -710,14 +676,22 @@
       window.userLon = lon;
 
       if (map) {
+        const position = { lat, lng: lon };
+
         if (!mapMarker) {
-          mapMarker = L.marker([lat, lon]).addTo(map);
+          mapMarker = new google.maps.Marker({
+            position,
+            map
+          });
         } else {
-          mapMarker.setLatLng([lat, lon]);
+          mapMarker.setPosition(position);
         }
-        map.setView([lat, lon], 10);
+
+        map.setCenter(position);
+        map.setZoom(10);
       }
 
+      // Reverse geocoding still via Nominatim to get county
       try {
         const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
@@ -726,10 +700,12 @@
         const countyRaw = data?.address?.county || data?.address?.state_district || data?.address?.region;
         const countyClean = countyRaw ? String(countyRaw).replace(/\s*County$/i, '').trim() : '';
 
-        if (data && data.display_name) {
-          elements.locationInput.value = data.display_name;
-        } else {
-          elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        if (!elements.locationInput.value) {
+          if (data && data.display_name) {
+            elements.locationInput.value = data.display_name;
+          } else {
+            elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+          }
         }
 
         if (countyClean) {
@@ -743,7 +719,9 @@
         }
       } catch (e) {
         console.error(e);
-        elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        if (!elements.locationInput.value) {
+          elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        }
         renderMessage(`Location set from ${sourceLabel}, but reverse-geocoding failed. You can pick county manually.`);
       }
 
@@ -766,174 +744,140 @@
       }, { timeout: 10000 });
     }
 
-    async function searchLocationText() {
+    // -----------------------
+    //  GOOGLE PLACES: AUTOCOMPLETE + SEARCH
+    // -----------------------
+
+    function isPlaceInWisconsin(addressComponents) {
+      const comps = addressComponents || [];
+      return comps.some(c =>
+        (c.types || []).includes('administrative_area_level_1') &&
+        (c.short_name === 'WI' || String(c.long_name).toLowerCase().includes('wisconsin'))
+      );
+    }
+
+    function onPlaceSelected() {
+      if (!autocomplete) return;
+      const place = autocomplete.getPlace();
+      if (!place || !place.geometry || !place.geometry.location) {
+        renderMessage('Could not get location details for that place. Try again.');
+        return;
+      }
+
+      if (!isPlaceInWisconsin(place.address_components || [])) {
+        renderMessage('Please pick a location in Wisconsin.');
+        return;
+      }
+
+      const lat = place.geometry.location.lat();
+      const lon = place.geometry.location.lng();
+
+      if (place.formatted_address) {
+        elements.locationInput.value = place.formatted_address;
+      }
+
+      handleLocationChange(lat, lon, 'Google place');
+    }
+
+    function searchLocationText() {
       const q = elements.locationInput.value.trim();
       if (!q) {
         renderMessage('Enter a city, ZIP, or address in Wisconsin to search.');
         return;
       }
-      await performSearchAndSetLocation(q, 'search');
-    }
+      if (!window.google || !map || !placesService) {
+        renderMessage('Map is still loading. Please wait a moment and try again.');
+        return;
+      }
 
-    async function performSearchAndSetLocation(query, sourceLabel) {
+      const query = q + ', Wisconsin';
+      const request = {
+        query,
+        fields: ['geometry', 'formatted_address', 'address_components']
+      };
+
       renderMessage('Searching Wisconsin locations…');
 
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=10&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
-        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        let data = await res.json();
-
-        if (!Array.isArray(data)) data = [];
-
-        const wiResults = data.filter(p => {
-          const state = p.address && (p.address.state || p.address.state_code);
-          if (!state) return false;
-          const s = String(state).toLowerCase();
-          return s.includes('wisconsin') || s === 'wi';
-        });
-
-        if (!wiResults.length) {
+      placesService.findPlaceFromQuery(request, (results, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !results || !results.length) {
           renderMessage('No Wisconsin locations found for that search. Try a different city/ZIP/address.');
           return;
         }
 
-        const best = wiResults[0];
-        const lat = parseFloat(best.lat);
-        const lon = parseFloat(best.lon);
-
-        if (isNaN(lat) || isNaN(lon)) {
+        const best = results[0];
+        if (!best.geometry || !best.geometry.location) {
           renderMessage('Search result had invalid coordinates. Try a different search.');
           return;
         }
 
-        elements.locationInput.value = best.display_name || query;
-        await handleLocationChange(lat, lon, sourceLabel);
-      } catch (e) {
-        console.error(e);
-        renderMessage('Error searching location. Try again or pick a point on the map.');
-      }
-    }
-
-    // -----------------------
-    //  AUTOCOMPLETE SUGGESTIONS (UP TO 10, WI ONLY)
-    // -----------------------
-
-    async function fetchSuggestions(query) {
-      if (!query) {
-        elements.locationSuggestions.style.display = 'none';
-        elements.locationSuggestions.innerHTML = '';
-        return;
-      }
-
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=10&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
-        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        let data = await res.json();
-        if (!Array.isArray(data)) data = [];
-
-        const wiResults = data.filter(p => {
-          const state = p.address && (p.address.state || p.address.state_code);
-          if (!state) return false;
-          const s = String(state).toLowerCase();
-          return s.includes('wisconsin') || s === 'wi';
-        });
-
-        if (!wiResults.length) {
-          elements.locationSuggestions.style.display = 'none';
-          elements.locationSuggestions.innerHTML = '';
+        if (!isPlaceInWisconsin(best.address_components || [])) {
+          renderMessage('Please pick a location in Wisconsin.');
           return;
         }
 
-        elements.locationSuggestions.innerHTML = wiResults.map(p => {
-          const label = p.display_name || p.name || '';
-          if (!label) return '';
-          return `<div class="suggestion-item"
-                       data-lat="${p.lat}"
-                       data-lon="${p.lon}"
-                       data-label="${escapeHtml(label)}">${escapeHtml(label)}</div>`;
-        }).join('');
+        const lat = best.geometry.location.lat();
+        const lon = best.geometry.location.lng();
 
-        if (!elements.locationSuggestions.innerHTML.trim()) {
-          elements.locationSuggestions.style.display = 'none';
-        } else {
-          elements.locationSuggestions.style.display = 'block';
-        }
-      } catch (e) {
-        console.error(e);
-        elements.locationSuggestions.style.display = 'none';
-        elements.locationSuggestions.innerHTML = '';
-      }
-    }
-
-    function handleSuggestionClick(e) {
-      const item = e.target.closest('.suggestion-item');
-      if (!item) return;
-
-      const lat = parseFloat(item.getAttribute('data-lat'));
-      const lon = parseFloat(item.getAttribute('data-lon'));
-      const label = item.getAttribute('data-label') || '';
-
-      if (!isNaN(lat) && !isNaN(lon)) {
-        elements.locationInput.value = label;
-        elements.locationSuggestions.style.display = 'none';
-        elements.locationSuggestions.innerHTML = '';
-        handleLocationChange(lat, lon, 'search suggestion');
-      }
-    }
-
-    function closeSuggestionsIfClickOutside(e) {
-      if (!elements.locationSuggestions.contains(e.target) &&
-          e.target !== elements.locationInput) {
-        elements.locationSuggestions.style.display = 'none';
-      }
+        elements.locationInput.value = best.formatted_address || query;
+        handleLocationChange(lat, lon, 'search');
+      });
     }
 
     // -----------------------
-    //  MAP INIT
+    //  GOOGLE MAP INIT (callback from API script)
     // -----------------------
 
     function initMap() {
-      map = L.map('map').setView([44.5, -89.5], 6);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
+      // Center on Wisconsin
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 44.5, lng: -89.5 },
+        zoom: 6,
+        mapTypeId: 'terrain'
+      });
 
-      map.on('click', async (e) => {
-        const { lat, lng } = e.latlng;
+      // Places service for "Go" searches
+      placesService = new google.maps.places.PlacesService(map);
+
+      // Bias autocomplete to Wisconsin area
+      const wiBounds = new google.maps.LatLngBounds(
+        { lat: 42.49, lng: -92.89 }, // SW-ish
+        { lat: 47.31, lng: -86.25 }  // NE-ish
+      );
+
+      const options = {
+        types: ['geocode'],
+        componentRestrictions: { country: 'us' },
+        fields: ['geometry', 'formatted_address', 'address_components']
+      };
+
+      autocomplete = new google.maps.places.Autocomplete(elements.locationInput, options);
+      autocomplete.setBounds(wiBounds);
+      autocomplete.setOptions({ strictBounds: false }); // bias, not hard lock
+
+      autocomplete.addListener('place_changed', onPlaceSelected);
+
+      // Map click sets location
+      map.addListener('click', async (e) => {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
         await handleLocationChange(lat, lng, 'map click');
       });
     }
 
     // -----------------------
-    //  INIT
+    //  INIT DOM
     // -----------------------
 
     document.addEventListener('DOMContentLoaded', () => {
       populateCountyDropdown(elements.countySelect);
       elements.dateInput.value = isoDateForToday();
       loadCsvData();
-      initMap();
 
       elements.btnUseLocation.addEventListener('click', useLocation);
       elements.btnSearchLocation.addEventListener('click', searchLocationText);
 
       elements.dateInput.addEventListener('change', computeTimes);
       elements.countySelect.addEventListener('change', computeTimes);
-
-      elements.locationInput.addEventListener('input', () => {
-        const q = elements.locationInput.value.trim();
-        if (suggestionTimeout) clearTimeout(suggestionTimeout);
-        if (!q) {
-          elements.locationSuggestions.style.display = 'none';
-          elements.locationSuggestions.innerHTML = '';
-          return;
-        }
-        suggestionTimeout = setTimeout(() => fetchSuggestions(q), 250);
-      });
-
-      elements.locationSuggestions.addEventListener('click', handleSuggestionClick);
-      document.addEventListener('click', closeSuggestionsIfClickOutside);
 
       elements.locationInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
@@ -943,8 +887,16 @@
       });
     });
   </script>
+
+  <!-- GOOGLE MAPS + PLACES API -->
+  <script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKKYHCKc2kb8XGnkc1SXvwLi_TB-zlw5o&libraries=places&callback=initMap">
+  </script>
 </body>
 </html>
+
 
 
 
