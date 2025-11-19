@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WI Deer Hunting Shooting Hours</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+      background: #f3f4f6;
+      color: #111827;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+    .muted {
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px 16px 18px;
+      box-shadow: 0 8px 24px rgba(15,23,42,0.08);
+      margin-top: 12px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    input[type="date"],
+    select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      margin-top: 4px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      font-size: 0.95rem;
+      background: #ffffff;
+    }
+    button {
+      margin-top: 12px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+      margin-left: 8px;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    #result {
+      margin-top: 16px;
+      font-size: 1rem;
+    }
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #eff6ff;
+      color: #1d4ed8;
+      margin-left: 6px;
+    }
+    .time-card {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .time-box {
+      flex: 1;
+      min-width: 140px;
+      background: linear-gradient(180deg,#ffffff,#f9fafb);
+      border-radius: 10px;
+      padding: 10px 12px;
+      box-shadow: 0 4px 16px rgba(15,23,42,0.06);
+    }
+    .time-label {
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+    .time-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .time-src {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .tiny {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+    .row-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .row-inline > label {
+      margin-top: 0;
+      font-weight: 400;
+    }
+    .row-inline select.small {
+      width: auto;
+      min-width: 140px;
+      flex: 0 0 auto;
+    }
+    @media (max-width: 600px) {
+      .row-inline {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>WI Deer Hunting Shooting Hours</h1>
+  <div class="muted">
+    2025 deer/bear/small game/fall turkey shooting hours, adjusted by Northern/Southern area and longitude Zone A–F.
+  </div>
+
+  <div class="card">
+    <div>
+      <button id="btnUseLocation">Use My Location</button>
+      <button id="btnCompute" class="secondary">Update</button>
+    </div>
+
+    <!-- COUNTY DROPDOWN -->
+    <label for="countySelect">County</label>
+    <select id="countySelect">
+      <option value="">Select county…</option>
+    </select>
+
+    <!-- REGION AUTO vs OVERRIDE -->
+    <label>Region</label>
+    <div class="row-inline">
+      <label>
+        <input type="radio" name="regionMode" value="auto" checked>
+        Auto from county (DNR north/south rule)
+      </label>
+      <label>
+        <input type="radio" name="regionMode" value="manual">
+        Override
+      </label>
+      <select id="regionOverride" class="small" disabled>
+        <option value="northern">Northern</option>
+        <option value="southern">Southern</option>
+      </select>
+    </div>
+
+    <!-- ZONE DROPDOWN -->
+    <label for="zone">Zone (Longitude)</label>
+    <select id="zone">
+      <option value="">Auto from location (if available)</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+      <option value="F">F</option>
+    </select>
+
+    <!-- DATE -->
+    <label for="dateInput">Date</label>
+    <input id="dateInput" type="date" />
+
+    <div id="result"></div>
+  </div>
+
+  <div class="card tiny">
+    <strong>Notes</strong><br>
+    • Northern area (per NR 10.06): Pierce, Dunn, Eau Claire, Clark, Marathon, Shawano, Oconto, Door, and all counties north of them; Southern is the remainder of the state.:contentReference[oaicite:0]{index=0}<br>
+    • Zone offsets: A = east of 88°W (0 min), B = 88–89°W (+4), C = 89–90°W (+8), D = 90–91°W (+12), E = 91–92°W (+16), F = west of 92°W (+20).:contentReference[oaicite:1]{index=1}<br>
+    • This page uses the official 2025 Northern &amp; Southern Zone A tables and adds the zone-specific minutes.
+  </div>
+
+  <script>
+    // -----------------------
+    //  STATIC COUNTY DATA
+    // -----------------------
+
+    const COUNTY_LIST = [
+      "Adams","Ashland","Barron","Bayfield","Brown","Buffalo","Burnett",
+      "Calumet","Chippewa","Clark","Columbia","Crawford","Dane","Dodge",
+      "Door","Douglas","Dunn","Eau Claire","Florence","Fond du Lac",
+      "Forest","Grant","Green","Green Lake","Iowa","Iron","Jackson",
+      "Jefferson","Juneau","Kenosha","Kewaunee","La Crosse","Lafayette",
+      "Langlade","Lincoln","Manitowoc","Marathon","Marinette","Marquette",
+      "Menominee","Milwaukee","Monroe","Oconto","Oneida","Outagamie",
+      "Ozaukee","Pepin","Pierce","Polk","Portage","Price","Racine",
+      "Richland","Rock","Rusk","Saint Croix","Sauk","Sawyer","Shawano",
+      "Sheboygan","Taylor","Trempealeau","Vernon","Vilas","Walworth",
+      "Washburn","Washington","Waukesha","Waupaca","Waushara","Winnebago",
+      "Wood"
+    ];
+
+    // Best-effort NORTHERN set: DNR's north-central forest list + statutory divider counties
+    // + a couple of clearly northwestern counties.
+    // Source for many northern counties: DNR North Central Forest ecological landscape list.:contentReference[oaicite:2]{index=2}
+    const NORTHERN_COUNTY_SET = new Set([
+      // Statutory divider counties (north area and all counties north of them):contentReference[oaicite:3]{index=3}
+      "Pierce","Dunn","Eau Claire","Clark","Marathon","Shawano","Oconto","Door",
+      // Strongly northern counties (North Central Forest, etc.):contentReference[oaicite:4]{index=4}
+      "Ashland","Barron","Bayfield","Chippewa","Douglas","Florence","Forest",
+      "Iron","Langlade","Lincoln","Marinette","Oneida","Price","Rusk","Sawyer",
+      "Taylor","Vilas","Washburn","Burnett","Polk"
+    ]);
+
+    function populateCountyDropdown(selectEl) {
+      COUNTY_LIST.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        selectEl.appendChild(opt);
+      });
+    }
+
+    function determineRegionFromCounty(countyName) {
+      if (!countyName) return "southern";
+      const normalized = countyName.replace(/county$/i, "").trim();
+      return NORTHERN_COUNTY_SET.has(normalized) ? "northern" : "southern";
+    }
+
+    // -----------------------
+    //  STATE & ELEMENTS
+    // -----------------------
+
+    let NORTHERN_DATA = {};
+    let SOUTHERN_DATA = {};
+
+    window.userLat = null;
+    window.userLon = null;
+
+    const elements = {
+      btnUseLocation: document.getElementById('btnUseLocation'),
+      btnCompute: document.getElementById('btnCompute'),
+      countySelect: document.getElementById('countySelect'),
+      dateInput: document.getElementById('dateInput'),
+      zone: document.getElementById('zone'),
+      result: document.getElementById('result'),
+      regionModeRadios: Array.from(document.querySelectorAll('input[name="regionMode"]')),
+      regionOverride: document.getElementById('regionOverride')
+    };
+
+    // -----------------------
+    //  UTILITIES
+    // -----------------------
+
+    function isoDateForToday() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function getMonthDayKeyFromInput() {
+      let val = elements.dateInput.value;
+      if (!val) val = isoDateForToday();
+      const d = new Date(val);
+      if (isNaN(d)) return null;
+      const month = d.getMonth() + 1;
+      const day = d.getDate();
+      return `${month}/${day}`;
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, s => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[s] || s));
+    }
+
+    function renderMessage(msg) {
+      elements.result.innerHTML = `<div class="tiny">${escapeHtml(msg)}</div>`;
+    }
+
+    // Zone A–F from longitude (auto mode)
+    function computeZoneFromLon(lon) {
+      if (typeof lon !== 'number' || isNaN(lon)) {
+        return { zone: 'A', offset: 0 };
+      }
+      const west = -lon; // -89 -> 89°W
+      if (west < 88) return { zone: 'A', offset: 0 };
+
+      // 88–89 => B, 89–90 => C, 90–91 => D, 91–92 => E, >92 => F
+      const delta = Math.floor(west - 88); // 0 => B, 1 => C, ...
+      const idx = Math.min(Math.max(delta, 0), 4); // clamp B..F
+      const zoneLetter = String.fromCharCode('B'.charCodeAt(0) + idx);
+      const offset = (idx + 1) * 4; // 4, 8, 12, 16, 20 minutes
+      return { zone: zoneLetter, offset };
+    }
+
+    function addMinutesToTime(timeStr, minutesToAdd) {
+      if (!timeStr) return '';
+      const parts = timeStr.split(':');
+      if (parts.length < 2) return timeStr;
+
+      let h = parseInt(parts[0], 10);
+      let m = parseInt(parts[1], 10);
+      if (isNaN(h) || isNaN(m)) return timeStr;
+
+      let total = h * 60 + m + minutesToAdd;
+      if (total < 0) total = 0;
+      let hr = Math.floor(total / 60);
+      let mn = total % 60;
+      return hr + ':' + mn.toString().padStart(2, '0');
+    }
+
+    // -----------------------
+    //  CSV LOADING
+    // -----------------------
+
+    async function loadCsvData() {
+      try {
+        const [northText, southText] = await Promise.all([
+          fetch('Shooting Hours(Northern).csv').then(r => r.text()),
+          fetch('Shooting Hours(Southern).csv').then(r => r.text())
+        ]);
+
+        NORTHERN_DATA = parseCsvToMap(northText, true);
+        SOUTHERN_DATA = parseCsvToMap(southText, false);
+
+        renderMessage('Data loaded. Use your location or adjust county/region/zone above.');
+      } catch (e) {
+        console.error(e);
+        renderMessage('Error loading shooting hours data. Make sure the two CSV files are in the same folder as index.html.');
+      }
+    }
+
+    function parseCsvToMap(csvText, isNorthern) {
+      const out = {};
+      const lines = csvText.trim().split(/\r?\n/);
+      if (!lines.length) return out;
+
+      const header = lines[0].split(',');
+      const idxDate = header.indexOf('Date');
+      const idxAM = header.indexOf('AM');
+      const idxPM = header.indexOf('PM');
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const cols = line.split(',');
+
+        if (idxDate < 0 || idxAM < 0 || idxPM < 0) continue;
+
+        const dateStr = cols[idxDate];
+        if (!dateStr) continue;
+
+        // You chose: ignore 1/1/2026 in the northern sheet
+        if (isNorthern && String(dateStr).startsWith('1/1/2026')) continue;
+
+        const am = cols[idxAM];
+        const pm = cols[idxPM];
+
+        const parts = String(dateStr).split('/');
+        if (parts.length < 2) continue;
+        const month = parseInt(parts[0], 10);
+        const day = parseInt(parts[1], 10);
+        if (isNaN(month) || isNaN(day)) continue;
+
+        const key = `${month}/${day}`;
+        out[key] = { am, pm };
+      }
+      return out;
+    }
+
+    // -----------------------
+    //  CORE COMPUTATION
+    // -----------------------
+
+    function getRegionMode() {
+      const checked = elements.regionModeRadios.find(r => r.checked);
+      return checked ? checked.value : 'auto';
+    }
+
+    function computeTimes() {
+      if (!Object.keys(NORTHERN_DATA).length || !Object.keys(SOUTHERN_DATA).length) {
+        renderMessage('Data is still loading. Please wait a moment or refresh.');
+        return;
+      }
+
+      const county = elements.countySelect.value;
+      const regionMode = getRegionMode();
+
+      let region;
+      if (regionMode === 'manual') {
+        region = elements.regionOverride.value || 'northern';
+      } else {
+        region = determineRegionFromCounty(county);
+      }
+
+      const key = getMonthDayKeyFromInput();
+      if (!key) {
+        renderMessage('Invalid date selected.');
+        return;
+      }
+
+      const dataset = region === 'northern' ? NORTHERN_DATA : SOUTHERN_DATA;
+      const row = dataset[key];
+
+      if (!row) {
+        renderMessage(`No shooting hours found for ${key} in the ${region} dataset.`);
+        return;
+      }
+
+      // Zone logic:
+      // 1. If user manually picked a zone, use that.
+      // 2. Else, if userLon is known, auto compute zone.
+      // 3. Else default to A (0 min).
+      let displayZone = 'A';
+      let offset = 0;
+
+      const selectedZone = elements.zone.value;
+      if (selectedZone) {
+        displayZone = selectedZone;
+        const idx = selectedZone.charCodeAt(0) - 'A'.charCodeAt(0); // A=0, B=1...
+        offset = Math.max(idx, 0) * 4; // A=0, B=4, C=8...
+      } else if (typeof window.userLon === 'number') {
+        const auto = computeZoneFromLon(window.userLon);
+        displayZone = auto.zone;
+        offset = auto.offset;
+      } else {
+        displayZone = 'A';
+        offset = 0;
+      }
+
+      const adjAM = addMinutesToTime(row.am, offset);
+      const adjPM = addMinutesToTime(row.pm, offset);
+
+      const dateLabel = elements.dateInput.value || isoDateForToday();
+      const countyLabel = county || '(county not selected)';
+      const regionLabel = region.charAt(0).toUpperCase() + region.slice(1);
+
+      elements.result.innerHTML = `
+        <div class="tiny">
+          Date: <strong>${dateLabel}</strong>
+          <span class="pill">${regionLabel} area</span>
+        </div>
+        <div class="tiny" style="margin-top:4px;">
+          County: <strong>${escapeHtml(countyLabel)}</strong><br>
+          Zone used: <strong>${displayZone}</strong> (offset: +${offset} min)
+          ${!selectedZone && typeof window.userLon !== 'number'
+            ? '<br><em>Tip: click “Use My Location” or choose a zone.</em>'
+            : ''}
+        </div>
+        <div class="time-card">
+          <div class="time-box">
+            <div class="time-label">AM</div>
+            <div class="time-value">${adjAM || '—'}</div>
+            <div class="time-src">Base table: ${escapeHtml(row.am || '—')}</div>
+          </div>
+          <div class="time-box">
+            <div class="time-label">PM</div>
+            <div class="time-value">${adjPM || '—'}</div>
+            <div class="time-src">Base table: ${escapeHtml(row.pm || '—')}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // -----------------------
+    //  LOCATION HANDLING
+    // -----------------------
+
+    async function useLocation() {
+      if (!navigator.geolocation) {
+        renderMessage('Geolocation is not supported in this browser.');
+        return;
+      }
+      renderMessage('Requesting location…');
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        window.userLat = lat;
+        window.userLon = lon;
+
+        try {
+          const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
+          const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+          const data = await res.json();
+          const countyRaw = data?.address?.county || data?.address?.state_district || data?.address?.region;
+          const countyClean = countyRaw ? String(countyRaw).replace(/\s*County$/i, '').trim() : '';
+
+          if (countyClean) {
+            // Try to select matching county in dropdown
+            const match = COUNTY_LIST.find(c => c.toLowerCase() === countyClean.toLowerCase());
+            if (match) {
+              elements.countySelect.value = match;
+            }
+            renderMessage(`Location detected: ${escapeHtml(countyClean)} County. Computing times…`);
+          } else {
+            renderMessage('Location found, but county name could not be determined. Select the county manually.');
+          }
+        } catch (e) {
+          console.error(e);
+          renderMessage('Location received, but reverse-geocoding failed. You can still pick county/region/zone manually.');
+        }
+
+        computeTimes();
+      }, (err) => {
+        console.warn(err);
+        renderMessage('Geolocation was denied or failed. You can enter county and choose region/zone manually.');
+      }, { timeout: 10000 });
+    }
+
+    // -----------------------
+    //  INIT
+    // -----------------------
+
+    document.addEventListener('DOMContentLoaded', () => {
+      populateCountyDropdown(elements.countySelect);
+      elements.dateInput.value = isoDateForToday();
+      loadCsvData();
+
+      elements.btnUseLocation.addEventListener('click', useLocation);
+      elements.btnCompute.addEventListener('click', computeTimes);
+
+      elements.dateInput.addEventListener('change', computeTimes);
+      elements.zone.addEventListener('change', computeTimes);
+      elements.countySelect.addEventListener('change', computeTimes);
+
+      // Region mode toggle
+      elements.regionModeRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          const mode = getRegionMode();
+          if (mode === 'manual') {
+            elements.regionOverride.disabled = false;
+          } else {
+            elements.regionOverride.disabled = true;
+          }
+          computeTimes();
+        });
+      });
+
+      elements.regionOverride.addEventListener('change', computeTimes);
+    });
+  </script>
+</body>
+</html>
+
