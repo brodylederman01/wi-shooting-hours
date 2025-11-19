@@ -172,6 +172,8 @@
       background: radial-gradient(circle at top, #0b1120, #020617);
       border: 1px solid rgba(148,163,184,0.4);
       box-shadow: 0 16px 44px rgba(0,0,0,0.9);
+      /* helps when scrolling into view under sticky header */
+      scroll-margin-top: 90px;
     }
     .result-header {
       display: flex;
@@ -336,7 +338,8 @@
           placeholder="Start typing a WI city or town (e.g. Eau Claire, Madison)…"
           style="flex:1; min-width: 180px;"
         />
-        <button id="btnSearchLocation" class="secondary small">Search</button>
+        <!-- Renamed button to "Go" -->
+        <button id="btnSearchLocation" class="secondary small">Go</button>
         <div id="locationSuggestions" class="suggestions-list" style="display:none;"></div>
       </div>
 
@@ -551,6 +554,13 @@
       return `${h}:${m.toString().padStart(2,'0')} ${suffix}`;
     }
 
+    // Smooth scroll to results
+    function scrollToResult() {
+      if (!elements.result) return;
+      const card = elements.result.querySelector('.result-card') || elements.result;
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     // -----------------------
     //  CSV LOADING
     // -----------------------
@@ -686,6 +696,9 @@
           </div>
         </div>
       `;
+
+      // Automatically scroll to results (helps mobile users)
+      scrollToResult();
     }
 
     // -----------------------
@@ -932,5 +945,6 @@
   </script>
 </body>
 </html>
+
 
 
