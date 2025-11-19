@@ -13,17 +13,42 @@
 
   <style>
     /* ====== GLOBAL LAYOUT & THEME ====== */
+    :root {
+      --bg-dark: #020617;
+      --bg-card: #020617;
+      --bg-card-soft: #0b1120;
+      --border-soft: rgba(148,163,184,0.3);
+      --accent-orange: #f97316;
+      --accent-orange-soft: rgba(249,115,22,0.6);
+      --accent-green: #16a34a;
+      --accent-green-deep: #14532d;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --shadow-strong: 0 18px 42px rgba(0,0,0,0.9);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      max-width: 960px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 20px 16px 40px;
+      padding: 18px 14px 40px;
       background:
-        radial-gradient(circle at top, rgba(15,118,110,0.45), transparent 55%),
-        radial-gradient(circle at bottom, rgba(113,63,18,0.4), transparent 60%),
-        #020617;
-      color: #e5e7eb;
+        radial-gradient(circle at 5% 0%, rgba(22,163,74,0.5), transparent 55%),
+        radial-gradient(circle at 100% 10%, rgba(180,83,9,0.35), transparent 55%),
+        repeating-linear-gradient(
+          135deg,
+          #020617 0,
+          #020617 14px,
+          #030712 14px,
+          #030712 28px
+        );
+      color: var(--text-main);
     }
+
     main {
       margin-top: 16px;
     }
@@ -32,58 +57,106 @@
     .site-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 16px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #14532d, #166534);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(250,204,21,0.6), transparent 55%),
+        linear-gradient(90deg, #064e3b, #14532d);
       color: #ecfdf5;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.7);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.85);
       position: sticky;
       top: 10px;
-      z-index: 20;
+      z-index: 40;
       backdrop-filter: blur(10px);
+      border: 1px solid rgba(22,163,74,0.6);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
     .logo-mark {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 999px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 30% 20%, #facc15, #b45309);
-      font-size: 1.6rem;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.7);
+      background:
+        radial-gradient(circle at 30% 15%, #facc15, #b45309);
+      font-size: 1.7rem;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.85);
+      border: 1px solid rgba(22,163,74,0.7);
     }
     .site-title {
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      font-size: 1.02rem;
       text-transform: uppercase;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
     }
     .site-subtitle {
       font-size: 0.8rem;
-      opacity: 0.9;
+      opacity: 0.95;
+    }
+    .header-tag {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.85);
+      border: 1px solid rgba(148,163,184,0.6);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     h1.page-heading {
-      font-size: 1.65rem;
-      margin: 14px 0 4px;
+      font-size: 1.8rem;
+      margin: 16px 0 4px;
       color: #f9fafb;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.7);
     }
     .muted {
-      color: #9ca3af;
-      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-size: 0.92rem;
       margin-bottom: 1rem;
     }
 
-    /* ====== CARDS / CONTAINERS ====== */
+    /* ====== CARD / LAYOUT ====== */
+    .layout-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.2fr);
+      gap: 16px;
+      align-items: flex-start;
+    }
+
     .card {
-      background: radial-gradient(circle at top left, #111827, #020617);
-      border-radius: 18px;
+      background:
+        radial-gradient(circle at top left, #111827, #020617);
+      border-radius: 20px;
       padding: 16px 16px 18px;
-      box-shadow: 0 18px 42px rgba(0,0,0,0.85);
-      margin-top: 12px;
-      border: 1px solid rgba(148,163,184,0.25);
+      box-shadow: var(--shadow-strong);
+      border: 1px solid var(--border-soft);
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .card-kicker {
+      font-size: 0.78rem;
+      color: var(--text-muted);
     }
 
     label {
@@ -106,6 +179,14 @@
       font-size: 0.95rem;
       background: #020617;
       color: #e5e7eb;
+      outline: none;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    input:focus,
+    select:focus {
+      border-color: var(--accent-orange);
+      box-shadow: 0 0 0 1px rgba(248,250,252,0.08);
+      background: #020617;
     }
     input::placeholder {
       color: #6b7280;
@@ -117,7 +198,7 @@
       padding: 9px 14px;
       border-radius: 999px;
       border: none;
-      background: #f97316; /* hunter orange */
+      background: var(--accent-orange);
       color: #111827;
       font-weight: 600;
       font-size: 0.95rem;
@@ -125,17 +206,17 @@
       display: inline-flex;
       gap: 6px;
       align-items: center;
-      box-shadow: 0 10px 28px rgba(249,115,22,0.6);
+      box-shadow: 0 10px 28px var(--accent-orange-soft);
       transition: transform 0.06s ease, box-shadow 0.06s ease, opacity 0.15s ease;
     }
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 12px 32px rgba(249,115,22,0.7);
+      box-shadow: 0 12px 32px rgba(249,115,22,0.8);
     }
     button.secondary {
-      background: #111827;
+      background: #0b1120;
       color: #e5e7eb;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.7);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.8);
       border: 1px solid #1f2937;
     }
     button.small {
@@ -149,15 +230,72 @@
       box-shadow: none;
     }
 
+    .row-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .hint-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
     /* ====== MAP ====== */
     #map {
       width: 100%;
       height: 260px;
       margin-top: 10px;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
       border: 1px solid #1f2937;
-      box-shadow: 0 10px 26px rgba(0,0,0,0.8);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.85);
+      background: #020617;
+      position: relative;
+      z-index: 1; /* suggestions will sit above this */
+    }
+
+    /* ====== AUTOCOMPLETE SUGGESTIONS ====== */
+    .suggestions {
+      position: relative;
+      width: 100%;
+      z-index: 3000; /* ensure above map tiles */
+    }
+    .suggestions-list {
+      position: absolute;
+      z-index: 3001;
+      left: 0;
+      right: 0;
+      top: calc(100% + 3px);
+      max-height: 260px;
+      overflow-y: auto;
+      background: rgba(2,6,23,0.98);
+      border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.95);
+      border: 1px solid #1f2937;
+      backdrop-filter: blur(14px);
+    }
+    .suggestion-item {
+      padding: 7px 11px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .suggestion-item-main {
+      font-weight: 500;
+    }
+    .suggestion-item-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .suggestion-item:hover {
+      background: #111827;
     }
 
     /* ====== RESULT CARD ====== */
@@ -167,12 +305,32 @@
     }
     .result-card {
       margin-top: 10px;
-      border-radius: 14px;
-      padding: 12px 12px 14px;
-      background: radial-gradient(circle at top, #0b1120, #020617);
-      border: 1px solid rgba(148,163,184,0.4);
-      box-shadow: 0 16px 44px rgba(0,0,0,0.9);
+      border-radius: 18px;
+      padding: 14px 14px 16px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(22,163,74,0.25), transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(248,113,22,0.25), transparent 55%),
+        linear-gradient(140deg, #020617, #020617 40%, #030712);
+      border: 1px solid rgba(148,163,184,0.55);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.95);
+      position: relative;
+      overflow: hidden;
     }
+    .result-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 120%, rgba(34,197,94,0.08) 0, transparent 60%),
+        radial-gradient(circle at 120% 0%, rgba(249,115,22,0.12) 0, transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .result-inner {
+      position: relative;
+      z-index: 1;
+    }
+
     .result-header {
       display: flex;
       justify-content: space-between;
@@ -186,16 +344,21 @@
       color: #f9fafb;
     }
     .pill {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       padding: 3px 9px;
       border-radius: 999px;
       font-size: 0.78rem;
       background: #064e3b;
       color: #bbf7d0;
-      border: 1px solid rgba(34,197,94,0.4);
+      border: 1px solid rgba(34,197,94,0.6);
+    }
+    .pill-icon {
+      font-size: 0.9rem;
     }
     .result-meta {
-      margin-top: 6px;
+      margin-top: 8px;
       font-size: 0.9rem;
       color: #e5e7eb;
     }
@@ -211,73 +374,69 @@
     }
     .time-box {
       flex: 1;
-      min-width: 160px;
-      background: radial-gradient(circle at top, #020617, #030712);
-      border-radius: 12px;
-      padding: 9px 11px;
+      min-width: 180px;
+      background:
+        radial-gradient(circle at top, #020617, #020617 55%, #030712);
+      border-radius: 14px;
+      padding: 10px 12px;
       border: 1px solid #374151;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.85);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.9);
     }
     .time-label {
-      font-size: 0.85rem;
+      font-size: 0.86rem;
       color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .time-label span {
+      font-size: 0.8rem;
+      opacity: 0.9;
     }
     .time-value {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      margin-top: 4px;
-      color: #facc15; /* sunrise/yellow */
+      margin-top: 5px;
+      color: #facc15;
+      letter-spacing: 0.03em;
     }
     .time-src {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #6b7280;
-      margin-top: 2px;
+      margin-top: 3px;
     }
     .tiny {
       font-size: 0.8rem;
       color: #9ca3af;
-      margin-top: 6px;
+      margin-top: 8px;
     }
 
-    .row-inline {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-top: 4px;
+    /* ====== SECONDARY INFO CARD ====== */
+    .info-card {
+      background:
+        radial-gradient(circle at 0% 0%, rgba(31,41,55,0.9), transparent 55%),
+        linear-gradient(145deg, #020617, #030712);
+      border-radius: 18px;
+      padding: 14px 14px 16px;
+      border: 1px solid rgba(55,65,81,0.9);
+      box-shadow: var(--shadow-strong);
+      margin-top: 10px;
     }
-
-    /* ====== AUTOCOMPLETE SUGGESTIONS ====== */
-    .suggestions {
-      position: relative;
-      width: 100%;
+    .info-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      margin-bottom: 4px;
     }
-    .suggestions-list {
-      position: absolute;
-      z-index: 30;
-      left: 0;
-      right: 0;
-      top: calc(100% + 2px);
-      max-height: 260px;
-      overflow-y: auto;
-      background: #020617;
-      border-radius: 10px;
-      box-shadow: 0 14px 38px rgba(0,0,0,0.9);
-      border: 1px solid #1f2937;
-    }
-    .suggestion-item {
-      padding: 6px 9px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      color: #e5e7eb;
-    }
-    .suggestion-item:hover {
-      background: #111827;
+    .info-list {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-left: 12px;
     }
 
     /* ====== FOOTER ====== */
     .site-footer {
-      margin-top: 20px;
+      margin-top: 22px;
       padding-top: 14px;
       border-top: 1px solid rgba(148,163,184,0.3);
       font-size: 0.8rem;
@@ -288,17 +447,28 @@
       font-size: 0.78rem;
     }
     .footer-domain {
-      color: #f97316;
+      color: var(--accent-orange);
       font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+      .layout-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
 
     @media (max-width: 700px) {
       body {
         max-width: 100%;
-        padding: 16px 10px 32px;
+        padding: 14px 10px 32px;
       }
       .site-header {
-        border-radius: 16px;
+        border-radius: 18px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      h1.page-heading {
+        font-size: 1.55rem;
       }
       .time-section {
         flex-direction: column;
@@ -309,65 +479,95 @@
 <body>
   <!-- HEADER -->
   <header class="site-header">
-    <div class="logo-mark">🦌</div>
-    <div>
-      <div class="site-title">WI HUNTING HOURS</div>
-      <div class="site-subtitle">Check legal shooting times by exact location</div>
+    <div class="header-left">
+      <div class="logo-mark">🦌</div>
+      <div>
+        <div class="site-title">WI HUNTING HOURS</div>
+        <div class="site-subtitle">2025 legal shooting times by exact location</div>
+      </div>
+    </div>
+    <div class="header-tag">
+      <span>🎯</span> <span>Deer • Bear • Small Game • Fall Turkey</span>
     </div>
   </header>
 
   <main>
     <h1 class="page-heading">2025 Shooting Hours</h1>
     <div class="muted">
-      Deer, bear, small game, and fall turkey — Northern/Southern areas with automatic longitude zones (A–F).
+      Uses official Northern / Southern tables and automatically adjusts by longitude zone (A–F) for your exact spot in Wisconsin.
     </div>
 
-    <div class="card">
-      <div class="row-inline" style="margin-bottom:8px;">
-        <button id="btnUseLocation">📍 Use My Location</button>
-      </div>
+    <div class="layout-grid">
+      <!-- LEFT: INPUTS / MAP -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Set your location & date</div>
+          <div class="card-kicker">Tap the map, search a city, or use your device location.</div>
+        </div>
 
-      <!-- SEARCH BY CITY / ZIP / ADDRESS with AUTOCOMPLETE -->
-      <label for="locationInput">City / ZIP / Address (in Wisconsin)</label>
-      <div class="row-inline suggestions">
-        <input
-          id="locationInput"
-          type="text"
-          placeholder="Start typing a WI city or town (e.g. Eau Claire, Madison)…"
-          style="flex:1; min-width: 180px;"
-        />
-        <button id="btnSearchLocation" class="secondary small">Search</button>
-        <div id="locationSuggestions" class="suggestions-list" style="display:none;"></div>
-      </div>
+        <div class="row-inline" style="margin-bottom:8px;">
+          <button id="btnUseLocation">📍 Use My Location</button>
+        </div>
 
-      <!-- MAP PICKER -->
-      <label>Pick exact location on map (optional)</label>
-      <div id="map"></div>
+        <!-- SEARCH BY CITY / ZIP / ADDRESS with AUTOCOMPLETE -->
+        <label for="locationInput">City / ZIP / Address (Wisconsin only)</label>
+        <div class="row-inline suggestions">
+          <input
+            id="locationInput"
+            type="text"
+            placeholder="Start typing a WI city or town (e.g. Eau Claire, Madison)…"
+            style="flex:1; min-width: 180px;"
+          />
+          <button id="btnSearchLocation" class="secondary small">Search</button>
+          <div id="locationSuggestions" class="suggestions-list" style="display:none;"></div>
+        </div>
+        <div class="hint-text">
+          Suggestions are limited to locations inside Wisconsin.
+        </div>
 
-      <!-- COUNTY DROPDOWN -->
-      <label for="countySelect">County</label>
-      <select id="countySelect">
-        <option value="">Select county…</option>
-      </select>
+        <!-- MAP PICKER -->
+        <label>Pick exact location on map (optional)</label>
+        <div id="map"></div>
+        <div class="hint-text">
+          Click the map anywhere in Wisconsin to snap to that spot and update county / zone.
+        </div>
 
-      <!-- DATE -->
-      <label for="dateInput">Date</label>
-      <input id="dateInput" type="date" />
+        <!-- COUNTY DROPDOWN -->
+        <label for="countySelect">County</label>
+        <select id="countySelect">
+          <option value="">Select county…</option>
+        </select>
 
-      <div id="result"></div>
-    </div>
+        <!-- DATE -->
+        <label for="dateInput">Date</label>
+        <input id="dateInput" type="date" />
 
-    <div class="card tiny">
-      <strong>How to use</strong><br>
-      1) Start typing a city or town in Wisconsin and pick from the dropdown, or click on the map, or use “My Location”.<br>
-      2) The app will auto-detect county, area (Northern/Southern), and zone (A–F). You can still change county or date manually.
+        <div class="hint-text">
+          Defaults to today. Change the date to see shooting hours for another day in 2025.
+        </div>
+      </section>
+
+      <!-- RIGHT: RESULTS / EXPLANATION -->
+      <section>
+        <div id="result"></div>
+
+        <div class="info-card">
+          <div class="info-title">How this tool works</div>
+          <ul class="info-list">
+            <li>Area (Northern vs Southern) is determined by county split used by Wisconsin DNR.</li>
+            <li>Base hours use Zone A tables; each 1° of longitude west adds 4 minutes, up to Zone F.</li>
+            <li>Location can be from your device, the map, or the search box (Wisconsin only).</li>
+            <li>Always double-check regulations and hours with the official Wisconsin DNR before hunting.</li>
+          </ul>
+        </div>
+      </section>
     </div>
   </main>
 
   <footer class="site-footer">
-    <div>Always confirm regulations with the official Wisconsin DNR before hunting.</div>
+    <div>For reference only. This tool is not an official DNR product. Always confirm hours and regulations with the Wisconsin DNR.</div>
     <div class="site-footer-small">
-      Built for hunters to quickly check today’s hours at <span class="footer-domain">WIHuntingHours.com</span>.
+      Built for hunters at <span class="footer-domain">WIHuntingHours.com</span>.
     </div>
   </footer>
 
@@ -473,20 +673,26 @@
     }
 
     function renderMessage(msg) {
-      elements.result.innerHTML = `<div class="tiny">${escapeHtml(msg)}</div>`;
+      elements.result.innerHTML = `
+        <div class="result-card">
+          <div class="result-inner">
+            <div class="tiny">${escapeHtml(msg)}</div>
+          </div>
+        </div>
+      `;
     }
 
     function computeZoneFromLon(lon) {
       if (typeof lon !== 'number' || isNaN(lon)) {
         return { zone: 'A', offset: 0 };
       }
-      const west = -lon;
+      const west = -lon; // -89 -> 89°W
       if (west < 88) return { zone: 'A', offset: 0 };
 
       const delta = Math.floor(west - 88);
-      const idx = Math.min(Math.max(delta, 0), 4);
+      const idx = Math.min(Math.max(delta, 0), 4); // B..F
       const zoneLetter = String.fromCharCode('B'.charCodeAt(0) + idx);
-      const offset = (idx + 1) * 4;
+      const offset = (idx + 1) * 4; // 4,8,12,16,20
       return { zone: zoneLetter, offset };
     }
 
@@ -520,7 +726,6 @@
       let suffix = 'AM';
 
       if (forcePm) {
-        // Always show as PM for ending time
         if (h === 0) {
           h = 12;
           suffix = 'PM';
@@ -530,11 +735,9 @@
           h = h - 12;
           suffix = 'PM';
         } else {
-          // 1–11 -> same hour, PM
           suffix = 'PM';
         }
       } else {
-        // Normal inference for start time
         if (h === 0) {
           h = 12;
           suffix = 'AM';
@@ -661,28 +864,40 @@
 
       elements.result.innerHTML = `
         <div class="result-card">
-          <div class="result-header">
-            <div class="result-date">Date: ${dateLabel}</div>
-            <div class="pill">${regionLabel} area</div>
-          </div>
-          <div class="result-meta">
-            <div><strong>County:</strong> ${escapeHtml(countyLabel)}</div>
-            <div><strong>Zone:</strong> ${displayZone}${typeof window.userLon !== 'number' ? ' (Zone A base – location not set)' : ''}</div>
-          </div>
-          <div class="time-section">
-            <div class="time-box">
-              <div class="time-label">Legal Shooting Start (AM)</div>
-              <div class="time-value">${displayAM || '—'}</div>
-              <div class="time-src">Base table: ${escapeHtml(row.am || '—')}</div>
+          <div class="result-inner">
+            <div class="result-header">
+              <div class="result-date">Date: ${dateLabel}</div>
+              <div class="pill">
+                <span class="pill-icon">📍</span>
+                <span>${regionLabel} area • Zone ${displayZone}</span>
+              </div>
             </div>
-            <div class="time-box">
-              <div class="time-label">Legal Shooting End (PM)</div>
-              <div class="time-value">${displayPM || '—'}</div>
-              <div class="time-src">Base table: ${escapeHtml(row.pm || '—')}</div>
+            <div class="result-meta">
+              <div><strong>County:</strong> ${escapeHtml(countyLabel)}</div>
+              <div><strong>Location source:</strong> ${typeof window.userLon === 'number' ? 'Map / search / device location' : 'Not set (Zone A base only)'}</div>
             </div>
-          </div>
-          <div class="tiny">
-            Times are legal shooting hours for 2025, using Northern/Southern tables plus Zone ${displayZone} offset.
+            <div class="time-section">
+              <div class="time-box">
+                <div class="time-label">
+                  Legal Shooting Start (AM)
+                  <span>first legal light</span>
+                </div>
+                <div class="time-value">${displayAM || '—'}</div>
+                <div class="time-src">Base table: ${escapeHtml(row.am || '—')}</div>
+              </div>
+              <div class="time-box">
+                <div class="time-label">
+                  Legal Shooting End (PM)
+                  <span>last legal light</span>
+                </div>
+                <div class="time-value">${displayPM || '—'}</div>
+                <div class="time-src">Base table: ${escapeHtml(row.pm || '—')}</div>
+              </div>
+            </div>
+            <div class="tiny">
+              Times reflect 2025 legal shooting hours for Wisconsin, using the Northern/Southern area split and longitude Zone ${displayZone} offset.
+              Always confirm hours with the official Wisconsin DNR before heading out.
+            </div>
           </div>
         </div>
       `;
@@ -834,10 +1049,15 @@
         elements.locationSuggestions.innerHTML = wiResults.map(p => {
           const label = p.display_name || p.name || '';
           if (!label) return '';
+          const main = label.split(',')[0];
+          const rest = label.replace(main, '').replace(/^,\s*/, '');
           return `<div class="suggestion-item"
                        data-lat="${p.lat}"
                        data-lon="${p.lon}"
-                       data-label="${escapeHtml(label)}">${escapeHtml(label)}</div>`;
+                       data-label="${escapeHtml(label)}">
+                    <div class="suggestion-item-main">${escapeHtml(main)}</div>
+                    <div class="suggestion-item-sub">${escapeHtml(rest)}</div>
+                  </div>`;
         }).join('');
 
         if (!elements.locationSuggestions.innerHTML.trim()) {
@@ -932,3 +1152,4 @@
   </script>
 </body>
 </html>
+
