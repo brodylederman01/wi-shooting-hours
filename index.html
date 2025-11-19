@@ -334,7 +334,7 @@
       return `${y}-${m}-${day}`;
     }
 
-    // FIXED: avoid time-zone issues; parse YYYY-MM-DD manually
+    // Avoid time-zone issues with <input type="date">
     function getMonthDayKeyFromInput() {
       let val = elements.dateInput.value;
       if (!val) {
@@ -351,7 +351,7 @@
     function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, s => ({
         '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-      }[s] || s]);
+      }[s] || s));
     }
 
     function renderMessage(msg) {
@@ -410,30 +410,34 @@
       }
     }
 
+    // More tolerant parser: assumes first three columns are Date, AM, PM.
     function parseCsvToMap(csvText, isNorthern) {
       const out = {};
-      const lines = csvText.trim().split(/\r?\n/);  // FIXED newline regex
-      if (!lines.length) return out;
+      const lines = csvText.trim().split(/\r?\n/);
+      if (lines.length === 0) return out;
 
-      const header = lines[0].split(',');
-      const idxDate = header.indexOf('Date');
-      const idxAM = header.indexOf('AM');
-      const idxPM = header.indexOf('PM');
+      // If the first line looks like a header row containing "Date", skip it.
+      let startIndex = 0;
+      const firstCols = lines[0].split(',');
+      if (firstCols[0].toLowerCase().includes('date')) {
+        startIndex = 1;
+      }
 
-      for (let i = 1; i < lines.length; i++) {
+      for (let i = startIndex; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
         const cols = line.split(',');
 
-        if (idxDate < 0 || idxAM < 0 || idxPM < 0) continue;
-        const dateStr = cols[idxDate];
+        if (cols.length < 3) continue;
+
+        const dateStr = (cols[0] || '').trim();
+        const am = (cols[1] || '').trim();
+        const pm = (cols[2] || '').trim();
+
         if (!dateStr) continue;
 
         // Ignore 1/1/2026 in Northern (your choice)
         if (isNorthern && String(dateStr).startsWith('1/1/2026')) continue;
-
-        const am = cols[idxAM];
-        const pm = cols[idxPM];
 
         const parts = String(dateStr).split('/');
         if (parts.length < 2) continue;
@@ -754,4 +758,5 @@
   </script>
 </body>
 </html>
+
 
