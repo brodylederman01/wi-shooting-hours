@@ -325,7 +325,7 @@
     <div class="card">
       <div class="row-inline" style="margin-bottom:8px;">
         <button id="btnUseLocation">📍 Use My Location</button>
-        <button id="btnCompute" class="secondary">🔄 Update</button>
+        <!-- Update button removed -->
       </div>
 
       <!-- SEARCH BY CITY / ZIP / ADDRESS with AUTOCOMPLETE -->
@@ -433,7 +433,6 @@
 
     const elements = {
       btnUseLocation: document.getElementById('btnUseLocation'),
-      btnCompute: document.getElementById('btnCompute'),
       locationInput: document.getElementById('locationInput'),
       btnSearchLocation: document.getElementById('btnSearchLocation'),
       countySelect: document.getElementById('countySelect'),
@@ -509,6 +508,34 @@
       let hr = Math.floor(total / 60);
       let mn = total % 60;
       return hr + ':' + mn.toString().padStart(2, '0');
+    }
+
+    // convert "HH:MM" (24h or 0-padded) to "h:MM AM/PM"
+    function formatTimeWithAmPm(timeStr, isPmLabel) {
+      if (!timeStr) return '';
+      const parts = timeStr.split(':');
+      if (parts.length < 2) return timeStr;
+      let h = parseInt(parts[0], 10);
+      let m = parseInt(parts[1], 10);
+      if (isNaN(h) || isNaN(m)) return timeStr;
+
+      let suffix = 'AM';
+      if (h === 0) {
+        h = 12;
+        suffix = 'AM';
+      } else if (h === 12) {
+        suffix = 'PM';
+      } else if (h > 12) {
+        h = h - 12;
+        suffix = 'PM';
+      } else {
+        suffix = h < 12 ? 'AM' : 'PM';
+      }
+
+      // If caller explicitly wants AM/PM label (AM for morning box, PM for evening),
+      // we can just trust suffix, but append AM/PM anyway.
+      // For clarity with your request, we always append AM or PM.
+      return `${h}:${m.toString().padStart(2,'0')} ${suffix}`;
     }
 
     // -----------------------
@@ -618,6 +645,9 @@
       const adjAM = addMinutesToTime(row.am, offset);
       const adjPM = addMinutesToTime(row.pm, offset);
 
+      const displayAM = formatTimeWithAmPm(adjAM, false);
+      const displayPM = formatTimeWithAmPm(adjPM, true);
+
       const dateLabel = elements.dateInput.value || isoDateForToday();
       const countyLabel = county || '(county not selected)';
       const regionLabel = region.charAt(0).toUpperCase() + region.slice(1);
@@ -634,13 +664,13 @@
           </div>
           <div class="time-section">
             <div class="time-box">
-              <div class="time-label">AM shooting hours</div>
-              <div class="time-value">${adjAM || '—'}</div>
+              <div class="time-label">Legal Shooting Time (AM)</div>
+              <div class="time-value">${displayAM || '—'}</div>
               <div class="time-src">Base table: ${escapeHtml(row.am || '—')}</div>
             </div>
             <div class="time-box">
-              <div class="time-label">PM shooting hours</div>
-              <div class="time-value">${adjPM || '—'}</div>
+              <div class="time-label">Legal Shooting Time (PM)</div>
+              <div class="time-value">${displayPM || '—'}</div>
               <div class="time-src">Base table: ${escapeHtml(row.pm || '—')}</div>
             </div>
           </div>
@@ -756,7 +786,7 @@
     }
 
     // -----------------------
-    //  AUTOCOMPLETE SUGGESTIONS
+    //  AUTOCOMPLETE SUGGESTIONS (SIMPLER & MORE FORGIVING)
     // -----------------------
 
     async function fetchSuggestions(query) {
@@ -769,29 +799,33 @@
       try {
         const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        const data = await res.json();
+        let data = await res.json();
 
-        const places = (Array.isArray(data) ? data : []).filter(p => {
-          const cls = p.class;
-          const type = p.type;
-          if (cls !== 'place') return false;
-          return ['city','town','village','hamlet','suburb','locality'].includes(type);
-        });
+        if (!Array.isArray(data)) {
+          data = [];
+        }
 
-        if (!places.length) {
+        if (!data.length) {
           elements.locationSuggestions.style.display = 'none';
           elements.locationSuggestions.innerHTML = '';
           return;
         }
 
-        elements.locationSuggestions.innerHTML = places.map(p => {
-          const label = p.display_name || (p.name || '');
+        // Don't filter by 'place' class anymore — show anything with a name
+        elements.locationSuggestions.innerHTML = data.map(p => {
+          const label = p.display_name || p.name || '';
+          if (!label) return '';
           return `<div class="suggestion-item"
                        data-lat="${p.lat}"
                        data-lon="${p.lon}"
                        data-label="${escapeHtml(label)}">${escapeHtml(label)}</div>`;
         }).join('');
-        elements.locationSuggestions.style.display = 'block';
+
+        if (!elements.locationSuggestions.innerHTML.trim()) {
+          elements.locationSuggestions.style.display = 'none';
+        } else {
+          elements.locationSuggestions.style.display = 'block';
+        }
       } catch (e) {
         console.error(e);
         elements.locationSuggestions.style.display = 'none';
@@ -850,7 +884,6 @@
       initMap();
 
       elements.btnUseLocation.addEventListener('click', useLocation);
-      elements.btnCompute.addEventListener('click', computeTimes);
       elements.btnSearchLocation.addEventListener('click', searchLocationText);
 
       elements.dateInput.addEventListener('change', computeTimes);
@@ -871,7 +904,7 @@
       elements.locationSuggestions.addEventListener('click', handleSuggestionClick);
       document.addEventListener('click', closeSuggestionsIfClickOutside);
 
-      // Press Enter to force a search (even if suggestions fail)
+      // Press Enter to force a search (even if suggestions glitch)
       elements.locationInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
