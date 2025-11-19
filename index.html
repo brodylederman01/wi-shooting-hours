@@ -21,7 +21,7 @@
       color: #111827;
     }
     h1 {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       margin-bottom: 0.25rem;
     }
     .muted {
@@ -31,9 +31,9 @@
     }
     .card {
       background: #ffffff;
-      border-radius: 16px;
-      padding: 18px 18px 20px;
-      box-shadow: 0 10px 28px rgba(15,23,42,0.12);
+      border-radius: 12px;
+      padding: 16px 16px 18px;
+      box-shadow: 0 8px 24px rgba(15,23,42,0.08);
       margin-top: 12px;
     }
     label {
@@ -49,7 +49,7 @@
       box-sizing: border-box;
       padding: 8px 10px;
       margin-top: 4px;
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1px solid #e5e7eb;
       font-size: 0.95rem;
       background: #ffffff;
@@ -78,83 +78,51 @@
       opacity: 0.6;
       cursor: default;
     }
-    #map {
-      width: 100%;
-      height: 260px;
-      margin-top: 10px;
-      border-radius: 12px;
-      overflow: hidden;
-    }
     #result {
       margin-top: 16px;
       font-size: 1rem;
     }
-    .result-card {
-      margin-top: 12px;
-      border-radius: 14px;
-      padding: 14px 14px 16px;
-      background: radial-gradient(circle at top left,#eff6ff,#ffffff);
-      box-shadow: 0 10px 26px rgba(15,23,42,0.16);
-    }
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .result-date {
-      font-size: 1.15rem;
-      font-weight: 600;
-    }
     .pill {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 999px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       background: #eff6ff;
       color: #1d4ed8;
+      margin-left: 6px;
     }
-    .result-meta {
-      margin-top: 8px;
-      font-size: 0.9rem;
-      color: #4b5563;
-    }
-    .result-meta strong {
-      font-weight: 600;
-    }
-    .time-section {
+    .time-card {
       display: flex;
       gap: 12px;
+      margin-top: 10px;
       flex-wrap: wrap;
-      margin-top: 12px;
     }
     .time-box {
       flex: 1;
-      min-width: 160px;
+      min-width: 140px;
       background: linear-gradient(180deg,#ffffff,#f9fafb);
-      border-radius: 12px;
+      border-radius: 10px;
       padding: 10px 12px;
-      box-shadow: 0 6px 20px rgba(15,23,42,0.10);
+      box-shadow: 0 4px 16px rgba(15,23,42,0.06);
     }
     .time-label {
       font-size: 0.9rem;
       color: #6b7280;
     }
     .time-value {
-      font-size: 1.4rem;
-      font-weight: 700;
+      font-size: 1.25rem;
+      font-weight: 600;
       margin-top: 4px;
     }
     .time-src {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: #9ca3af;
       margin-top: 2px;
     }
     .tiny {
       font-size: 0.8rem;
       color: #6b7280;
-      margin-top: 6px;
+      margin-top: 8px;
     }
     .row-inline {
       display: flex;
@@ -167,30 +135,17 @@
       margin-top: 0;
       font-weight: 400;
     }
-    /* Suggestions dropdown */
-    .suggestions {
-      position: relative;
+    .row-inline select.small {
+      width: auto;
+      min-width: 140px;
+      flex: 0 0 auto;
     }
-    .suggestions-list {
-      position: absolute;
-      z-index: 20;
-      left: 0;
-      right: 0;
-      top: calc(100% + 4px);
-      max-height: 220px;
-      overflow-y: auto;
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 10px 28px rgba(15,23,42,0.2);
-      border: 1px solid #e5e7eb;
-    }
-    .suggestion-item {
-      padding: 6px 10px;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    .suggestion-item:hover {
-      background: #eff6ff;
+    #map {
+      width: 100%;
+      height: 260px;
+      margin-top: 10px;
+      border-radius: 12px;
+      overflow: hidden;
     }
     @media (max-width: 700px) {
       body {
@@ -205,7 +160,7 @@
 <body>
   <h1>WI Deer Hunting Shooting Hours</h1>
   <div class="muted">
-    2025 deer/bear/small game/fall turkey shooting hours, using Northern/Southern areas and automatic longitude zone (A–F).
+    2025 deer/bear/small game/fall turkey shooting hours, adjusted by Northern/Southern area and longitude Zone A–F.
   </div>
 
   <div class="card">
@@ -214,17 +169,16 @@
       <button id="btnCompute" class="secondary">Update</button>
     </div>
 
-    <!-- SEARCH BY CITY / ZIP / ADDRESS with AUTOCOMPLETE -->
+    <!-- SEARCH BY CITY / ZIP / ADDRESS -->
     <label for="locationInput">City / ZIP / Address (in Wisconsin)</label>
-    <div class="row-inline suggestions">
+    <div class="row-inline">
       <input
         id="locationInput"
         type="text"
-        placeholder="Start typing a WI city or town..."
+        placeholder="e.g. Eau Claire, 53703, 123 Main St, Madison"
         style="flex:1; min-width: 180px;"
       />
       <button id="btnSearchLocation" class="secondary small">Search</button>
-      <div id="locationSuggestions" class="suggestions-list" style="display:none;"></div>
     </div>
 
     <!-- MAP PICKER -->
@@ -237,6 +191,35 @@
       <option value="">Select county…</option>
     </select>
 
+    <!-- REGION AUTO vs OVERRIDE -->
+    <label>Region</label>
+    <div class="row-inline">
+      <label>
+        <input type="radio" name="regionMode" value="auto" checked>
+        Auto from county (North/South rule)
+      </label>
+      <label>
+        <input type="radio" name="regionMode" value="manual">
+        Override
+      </label>
+      <select id="regionOverride" class="small" disabled>
+        <option value="northern">Northern</option>
+        <option value="southern">Southern</option>
+      </select>
+    </div>
+
+    <!-- ZONE DROPDOWN -->
+    <label for="zone">Zone (Longitude)</label>
+    <select id="zone">
+      <option value="">Auto from location (if available)</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+      <option value="F">F</option>
+    </select>
+
     <!-- DATE -->
     <label for="dateInput">Date</label>
     <input id="dateInput" type="date" />
@@ -246,8 +229,8 @@
 
   <div class="card tiny">
     <strong>How to use</strong><br>
-    1) Start typing a city or town in Wisconsin and pick from suggestions, or click on the map, or use “My Location”.<br>
-    2) The app will auto-detect county, area (Northern/Southern), and zone (A–F). You can still change county or date manually.
+    1) Enter a city/ZIP/address or click on the map — that sets your exact location, county, and auto zone.<br>
+    2) Or just choose a county and date manually. You can still override region (North/South) and zone (A–F) if needed.
   </div>
 
   <!-- Leaflet JS -->
@@ -316,11 +299,11 @@
       btnSearchLocation: document.getElementById('btnSearchLocation'),
       countySelect: document.getElementById('countySelect'),
       dateInput: document.getElementById('dateInput'),
+      zone: document.getElementById('zone'),
       result: document.getElementById('result'),
-      locationSuggestions: document.getElementById('locationSuggestions')
+      regionModeRadios: Array.from(document.querySelectorAll('input[name="regionMode"]')),
+      regionOverride: document.getElementById('regionOverride')
     };
-
-    let suggestionTimeout = null;
 
     // -----------------------
     //  UTILITIES
@@ -334,7 +317,7 @@
       return `${y}-${m}-${day}`;
     }
 
-    // Avoid time-zone issues with <input type="date">
+    // FIXED: avoid time-zone issues; parse YYYY-MM-DD manually
     function getMonthDayKeyFromInput() {
       let val = elements.dateInput.value;
       if (!val) {
@@ -364,9 +347,7 @@
       }
       const west = -lon; // -89 -> 89°W
       if (west < 88) return { zone: 'A', offset: 0 };
-
-      // 88–89 => B, 89–90 => C, 90–91 => D, 91–92 => E, >92 => F
-      const delta = Math.floor(west - 88); // 0 => B, 1 => C, ...
+      const delta = Math.floor(west - 88); // 0 => B, 1 => C, etc.
       const idx = Math.min(Math.max(delta, 0), 4); // clamp B..F
       const zoneLetter = String.fromCharCode('B'.charCodeAt(0) + idx);
       const offset = (idx + 1) * 4; // 4, 8, 12, 16, 20
@@ -410,34 +391,30 @@
       }
     }
 
-    // More tolerant parser: assumes first three columns are Date, AM, PM.
     function parseCsvToMap(csvText, isNorthern) {
       const out = {};
       const lines = csvText.trim().split(/\r?\n/);
-      if (lines.length === 0) return out;
+      if (!lines.length) return out;
 
-      // If the first line looks like a header row containing "Date", skip it.
-      let startIndex = 0;
-      const firstCols = lines[0].split(',');
-      if (firstCols[0].toLowerCase().includes('date')) {
-        startIndex = 1;
-      }
+      const header = lines[0].split(',');
+      const idxDate = header.indexOf('Date');
+      const idxAM = header.indexOf('AM');
+      const idxPM = header.indexOf('PM');
 
-      for (let i = startIndex; i < lines.length; i++) {
+      for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
         const cols = line.split(',');
 
-        if (cols.length < 3) continue;
-
-        const dateStr = (cols[0] || '').trim();
-        const am = (cols[1] || '').trim();
-        const pm = (cols[2] || '').trim();
-
+        if (idxDate < 0 || idxAM < 0 || idxPM < 0) continue;
+        const dateStr = cols[idxDate];
         if (!dateStr) continue;
 
         // Ignore 1/1/2026 in Northern (your choice)
         if (isNorthern && String(dateStr).startsWith('1/1/2026')) continue;
+
+        const am = cols[idxAM];
+        const pm = cols[idxPM];
 
         const parts = String(dateStr).split('/');
         if (parts.length < 2) continue;
@@ -455,6 +432,11 @@
     //  CORE COMPUTATION
     // -----------------------
 
+    function getRegionMode() {
+      const checked = elements.regionModeRadios.find(r => r.checked);
+      return checked ? checked.value : 'auto';
+    }
+
     function computeTimes() {
       if (!Object.keys(NORTHERN_DATA).length || !Object.keys(SOUTHERN_DATA).length) {
         renderMessage('Data is still loading. Please wait a moment or refresh.');
@@ -462,7 +444,14 @@
       }
 
       const county = elements.countySelect.value;
-      const region = determineRegionFromCounty(county);
+      const regionMode = getRegionMode();
+
+      let region;
+      if (regionMode === 'manual') {
+        region = elements.regionOverride.value || 'northern';
+      } else {
+        region = determineRegionFromCounty(county);
+      }
 
       const key = getMonthDayKeyFromInput();
       if (!key) {
@@ -478,11 +467,16 @@
         return;
       }
 
-      // Zone: always auto from longitude if we have it; otherwise Zone A base table
+      // Zone logic – manual > auto-from-lon > default A
       let displayZone = 'A';
       let offset = 0;
 
-      if (typeof window.userLon === 'number') {
+      const selectedZone = elements.zone.value;
+      if (selectedZone) {
+        displayZone = selectedZone;
+        const idx = selectedZone.charCodeAt(0) - 'A'.charCodeAt(0); // A=0, B=1...
+        offset = Math.max(idx, 0) * 4; // A=0, B=4, C=8 ...
+      } else if (typeof window.userLon === 'number') {
         const auto = computeZoneFromLon(window.userLon);
         displayZone = auto.zone;
         offset = auto.offset;
@@ -499,29 +493,27 @@
       const regionLabel = region.charAt(0).toUpperCase() + region.slice(1);
 
       elements.result.innerHTML = `
-        <div class="result-card">
-          <div class="result-header">
-            <div class="result-date">Date: ${dateLabel}</div>
-            <div class="pill">${regionLabel} area</div>
+        <div class="tiny">
+          Date: <strong>${dateLabel}</strong>
+          <span class="pill">${regionLabel} area</span>
+        </div>
+        <div class="tiny" style="margin-top:4px;">
+          County: <strong>${escapeHtml(countyLabel)}</strong><br>
+          Zone used: <strong>${displayZone}</strong> (offset: +${offset} min)
+          ${!selectedZone && typeof window.userLon !== 'number'
+            ? '<br><em>Tip: use the search box, map, or “Use My Location” to auto-pick a zone.</em>'
+            : ''}
+        </div>
+        <div class="time-card">
+          <div class="time-box">
+            <div class="time-label">AM</div>
+            <div class="time-value">${adjAM || '—'}</div>
+            <div class="time-src">Base table: ${escapeHtml(row.am || '—')}</div>
           </div>
-          <div class="result-meta">
-            <div><strong>County:</strong> ${escapeHtml(countyLabel)}</div>
-            <div><strong>Zone:</strong> ${displayZone}${typeof window.userLon !== 'number' ? ' (Zone A base – location not set)' : ''}</div>
-          </div>
-          <div class="time-section">
-            <div class="time-box">
-              <div class="time-label">AM shooting hours</div>
-              <div class="time-value">${adjAM || '—'}</div>
-              <div class="time-src">Base table: ${escapeHtml(row.am || '—')}</div>
-            </div>
-            <div class="time-box">
-              <div class="time-label">PM shooting hours</div>
-              <div class="time-value">${adjPM || '—'}</div>
-              <div class="time-src">Base table: ${escapeHtml(row.pm || '—')}</div>
-            </div>
-          </div>
-          <div class="tiny">
-            Times shown are legal shooting hours for 2025, using the Northern/Southern area tables and the Zone ${displayZone} offset.
+          <div class="time-box">
+            <div class="time-label">PM</div>
+            <div class="time-value">${adjPM || '—'}</div>
+            <div class="time-src">Base table: ${escapeHtml(row.pm || '—')}</div>
           </div>
         </div>
       `;
@@ -566,6 +558,8 @@
         renderMessage(`Location set from ${sourceLabel}, but reverse-geocoding failed. You can pick county manually.`);
       }
 
+      // Clear manual zone so auto-zone from lon applies unless the user sets one
+      elements.zone.value = "";
       computeTimes();
     }
 
@@ -591,20 +585,17 @@
         renderMessage('Enter a city, ZIP, or address in Wisconsin to search.');
         return;
       }
-      await performSearchAndSetLocation(q, 'search');
-    }
-
-    async function performSearchAndSetLocation(query, sourceLabel) {
       renderMessage('Searching location…');
 
       try {
         // Bias to Wisconsin, US
-        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
+        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us&q=${encodeURIComponent(q + ', Wisconsin')}`;
         let res = await fetch(url, { headers: { 'Accept': 'application/json' } });
         let data = await res.json();
 
+        // If nothing found with ", Wisconsin" added, fall back to raw query
         if (!Array.isArray(data) || data.length === 0) {
-          const url2 = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&q=${encodeURIComponent(query)}`;
+          const url2 = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`;
           res = await fetch(url2, { headers: { 'Accept': 'application/json' } });
           data = await res.json();
         }
@@ -623,78 +614,10 @@
           return;
         }
 
-        elements.locationInput.value = best.display_name || query;
-        await handleLocationChange(lat, lon, sourceLabel);
+        await handleLocationChange(lat, lon, 'search');
       } catch (e) {
         console.error(e);
         renderMessage('Error searching location. Try again or pick a point on the map.');
-      }
-    }
-
-    // -----------------------
-    //  AUTOCOMPLETE SUGGESTIONS
-    // -----------------------
-
-    async function fetchSuggestions(query) {
-      if (!query) {
-        elements.locationSuggestions.style.display = 'none';
-        elements.locationSuggestions.innerHTML = '';
-        return;
-      }
-
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
-        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        const data = await res.json();
-
-        const places = (Array.isArray(data) ? data : []).filter(p => {
-          const cls = p.class;
-          const type = p.type;
-          if (cls !== 'place') return false;
-          return ['city','town','village','hamlet','suburb','locality'].includes(type);
-        });
-
-        if (!places.length) {
-          elements.locationSuggestions.style.display = 'none';
-          elements.locationSuggestions.innerHTML = '';
-          return;
-        }
-
-        elements.locationSuggestions.innerHTML = places.map(p => {
-          const label = p.display_name || (p.name || '');
-          return `<div class="suggestion-item"
-                       data-lat="${p.lat}"
-                       data-lon="${p.lon}"
-                       data-label="${escapeHtml(label)}">${escapeHtml(label)}</div>`;
-        }).join('');
-        elements.locationSuggestions.style.display = 'block';
-      } catch (e) {
-        console.error(e);
-        elements.locationSuggestions.style.display = 'none';
-        elements.locationSuggestions.innerHTML = '';
-      }
-    }
-
-    function handleSuggestionClick(e) {
-      const item = e.target.closest('.suggestion-item');
-      if (!item) return;
-
-      const lat = parseFloat(item.getAttribute('data-lat'));
-      const lon = parseFloat(item.getAttribute('data-lon'));
-      const label = item.getAttribute('data-label') || '';
-
-      if (!isNaN(lat) && !isNaN(lon)) {
-        elements.locationInput.value = label;
-        elements.locationSuggestions.style.display = 'none';
-        elements.locationSuggestions.innerHTML = '';
-        handleLocationChange(lat, lon, 'search suggestion');
-      }
-    }
-
-    function closeSuggestionsIfClickOutside(e) {
-      if (!elements.locationSuggestions.contains(e.target) &&
-          e.target !== elements.locationInput) {
-        elements.locationSuggestions.style.display = 'none';
       }
     }
 
@@ -730,22 +653,23 @@
       elements.btnSearchLocation.addEventListener('click', searchLocationText);
 
       elements.dateInput.addEventListener('change', computeTimes);
+      elements.zone.addEventListener('change', computeTimes);
       elements.countySelect.addEventListener('change', computeTimes);
 
-      // Autocomplete input
-      elements.locationInput.addEventListener('input', () => {
-        const q = elements.locationInput.value.trim();
-        if (suggestionTimeout) clearTimeout(suggestionTimeout);
-        if (!q) {
-          elements.locationSuggestions.style.display = 'none';
-          elements.locationSuggestions.innerHTML = '';
-          return;
-        }
-        suggestionTimeout = setTimeout(() => fetchSuggestions(q), 250);
+      // Region mode toggle
+      elements.regionModeRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          const mode = getRegionMode();
+          if (mode === 'manual') {
+            elements.regionOverride.disabled = false;
+          } else {
+            elements.regionOverride.disabled = true;
+          }
+          computeTimes();
+        });
       });
 
-      elements.locationSuggestions.addEventListener('click', handleSuggestionClick);
-      document.addEventListener('click', closeSuggestionsIfClickOutside);
+      elements.regionOverride.addEventListener('change', computeTimes);
 
       // Allow pressing Enter in the search box to trigger search
       elements.locationInput.addEventListener('keydown', (e) => {
