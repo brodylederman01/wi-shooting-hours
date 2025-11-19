@@ -351,7 +351,7 @@
     function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, s => ({
         '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-      }[s] || s));
+      }[s] || s]);
     }
 
     function renderMessage(msg) {
@@ -412,7 +412,7 @@
 
     function parseCsvToMap(csvText, isNorthern) {
       const out = {};
-      const lines = csvText.trim().split(/\r?\\n/);
+      const lines = csvText.trim().split(/\r?\n/);  // FIXED newline regex
       if (!lines.length) return out;
 
       const header = lines[0].split(',');
@@ -595,12 +595,12 @@
 
       try {
         // Bias to Wisconsin, US
-        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
+        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
         let res = await fetch(url, { headers: { 'Accept': 'application/json' } });
         let data = await res.json();
 
         if (!Array.isArray(data) || data.length === 0) {
-          const url2 = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`;
+          const url2 = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&q=${encodeURIComponent(query)}`;
           res = await fetch(url2, { headers: { 'Accept': 'application/json' } });
           data = await res.json();
         }
@@ -754,5 +754,4 @@
   </script>
 </body>
 </html>
-
 
