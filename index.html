@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WI Deer Hunting Shooting Hours</title>
 
-  <!-- No Leaflet CSS needed with Google Maps -->
-
   <style>
     /* ====== GLOBAL LAYOUT & THEME ====== */
     body {
@@ -156,11 +154,84 @@
       box-shadow: 0 10px 26px rgba(0,0,0,0.8);
     }
 
-    /* ====== RESULT CARD ====== */
+    /* ====== RESULT AREA (for messages only) ====== */
     #result {
       margin-top: 16px;
       font-size: 1rem;
     }
+
+    .tiny {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
+    .row-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .suggestions {
+      position: relative;
+      width: 100%;
+    }
+
+    /* ====== MODAL / POPUP ====== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal {
+      background: radial-gradient(circle at top, #020617, #020617);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      max-width: 420px;
+      width: calc(100% - 32px);
+      box-shadow: 0 24px 68px rgba(0,0,0,0.95);
+      border: 1px solid rgba(148,163,184,0.4);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: none;
+      padding: 4px;
+      margin-top: 0;
+    }
+    .modal-close:hover {
+      color: #e5e7eb;
+      transform: none;
+      box-shadow: none;
+    }
+    .modal-title {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    .modal-location {
+      display: block;
+      margin-top: 2px;
+      font-size: 1.05rem;
+      color: #f9fafb;
+      font-weight: 600;
+    }
+
     .result-card {
       margin-top: 10px;
       border-radius: 14px;
@@ -168,7 +239,6 @@
       background: radial-gradient(circle at top, #0b1120, #020617);
       border: 1px solid rgba(148,163,184,0.4);
       box-shadow: 0 16px 44px rgba(0,0,0,0.9);
-      scroll-margin-top: 90px; /* helps when scrolling into view under sticky header */
     }
     .result-header {
       display: flex;
@@ -223,31 +293,12 @@
       font-size: 1.5rem;
       font-weight: 700;
       margin-top: 4px;
-      color: #facc15; /* sunrise/yellow */
+      color: #facc15;
     }
     .time-src {
       font-size: 0.8rem;
       color: #6b7280;
       margin-top: 2px;
-    }
-    .tiny {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      margin-top: 6px;
-    }
-
-    .row-inline {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-top: 4px;
-    }
-
-    /* ====== AUTOCOMPLETE WRAPPER (no custom dropdown now) ====== */
-    .suggestions {
-      position: relative;
-      width: 100%;
     }
 
     /* ====== FOOTER ====== */
@@ -311,31 +362,24 @@
           placeholder="Start typing a WI city or town (e.g. Eau Claire, Madison)…"
           style="flex:1; min-width: 180px;"
         />
-        <!-- "Go" button triggers a Places query if user doesn't pick from dropdown -->
-        <button id="btnSearchLocation" class="secondary small">Go</button>
       </div>
 
       <!-- MAP PICKER -->
       <label>Pick exact location on map (optional)</label>
       <div id="map"></div>
 
-      <!-- COUNTY DROPDOWN -->
-      <label for="countySelect">County</label>
-      <select id="countySelect">
-        <option value="">Select county…</option>
-      </select>
-
       <!-- DATE -->
       <label for="dateInput">Date</label>
       <input id="dateInput" type="date" />
 
+      <!-- Only used for status / errors, not the main result card -->
       <div id="result"></div>
     </div>
 
     <div class="card tiny">
       <strong>How to use</strong><br>
       1) Start typing a city or town in Wisconsin and pick from the dropdown, or click on the map, or use “My Location”.<br>
-      2) The app will auto-detect county, area (Northern/Southern), and zone (A–F). You can still change county or date manually.
+      2) The app will auto-detect county, area (Northern/Southern), and zone (A–F). You can still change the date manually.
     </div>
   </main>
 
@@ -345,6 +389,14 @@
       Built for hunters to quickly check today’s hours at <span class="footer-domain">WIHuntingHours.com</span>.
     </div>
   </footer>
+
+  <!-- RESULT MODAL -->
+  <div id="resultModal" class="modal-backdrop">
+    <div class="modal">
+      <button class="modal-close" type="button" aria-label="Close">✕</button>
+      <div id="resultModalContent"></div>
+    </div>
+  </div>
 
   <script>
     // -----------------------
@@ -373,15 +425,6 @@
       "Taylor","Vilas","Washburn","Burnett","Polk"
     ]);
 
-    function populateCountyDropdown(selectEl) {
-      COUNTY_LIST.forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        selectEl.appendChild(opt);
-      });
-    }
-
     function determineRegionFromCounty(countyName) {
       if (!countyName) return "southern";
       const normalized = countyName.replace(/county$/i, "").trim();
@@ -403,16 +446,18 @@
     window.userLat = null;
     window.userLon = null;
 
+    let selectedCounty = '';
+    let lastLocationLabel = '';
+
     const elements = {
       btnUseLocation: document.getElementById('btnUseLocation'),
       locationInput: document.getElementById('locationInput'),
-      btnSearchLocation: document.getElementById('btnSearchLocation'),
-      countySelect: document.getElementById('countySelect'),
       dateInput: document.getElementById('dateInput'),
-      result: document.getElementById('result')
+      result: document.getElementById('result'),
+      resultModal: document.getElementById('resultModal'),
+      resultModalContent: document.getElementById('resultModalContent'),
+      modalClose: document.querySelector('.modal-close')
     };
-
-    let suggestionTimeout = null; // leftover var, not used now but harmless
 
     // -----------------------
     //  UTILITIES
@@ -479,9 +524,6 @@
       return hr + ':' + mn.toString().padStart(2, '0');
     }
 
-    // AM/PM formatter:
-    //  - for AM side: infer normally
-    //  - for PM side: always label as PM (end of day)
     function formatTimeWithAmPm(timeStr, forcePm = false) {
       if (!timeStr) return '';
       const parts = timeStr.split(':');
@@ -521,11 +563,21 @@
       return `${h}:${m.toString().padStart(2,'0')} ${suffix}`;
     }
 
-    // Smooth scroll to results
-    function scrollToResult() {
-      if (!elements.result) return;
-      const card = elements.result.querySelector('.result-card') || elements.result;
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Modal helpers
+    function openResultModal(innerHtml, locationLabel) {
+      const safeLocation = locationLabel ? escapeHtml(locationLabel) : 'Selected Location';
+      elements.resultModalContent.innerHTML = `
+        <div class="modal-title">
+          Shooting Hours For
+          <span class="modal-location">${safeLocation}</span>
+        </div>
+        ${innerHtml}
+      `;
+      elements.resultModal.style.display = 'flex';
+    }
+
+    function closeResultModal() {
+      elements.resultModal.style.display = 'none';
     }
 
     // -----------------------
@@ -597,7 +649,7 @@
         return;
       }
 
-      const county = elements.countySelect.value;
+      const county = selectedCounty;
       const region = determineRegionFromCounty(county);
 
       const key = getMonthDayKeyFromInput();
@@ -621,30 +673,27 @@
         const auto = computeZoneFromLon(window.userLon);
         displayZone = auto.zone;
         offset = auto.offset;
-      } else {
-        displayZone = 'A';
-        offset = 0;
       }
 
       const adjAM = addMinutesToTime(row.am, offset);
       const adjPM = addMinutesToTime(row.pm, offset);
 
-      const displayAM = formatTimeWithAmPm(adjAM, false); // start (AM)
-      const displayPM = formatTimeWithAmPm(adjPM, true);  // end (always PM)
+      const displayAM = formatTimeWithAmPm(adjAM, false);
+      const displayPM = formatTimeWithAmPm(adjPM, true);
 
       const dateLabel = elements.dateInput.value || isoDateForToday();
-      const countyLabel = county || '(county not selected)';
+      const countyLabel = county || '(county not detected)';
       const regionLabel = region.charAt(0).toUpperCase() + region.slice(1);
 
-      elements.result.innerHTML = `
+      const cardHtml = `
         <div class="result-card">
           <div class="result-header">
-            <div class="result-date">Date: ${dateLabel}</div>
-            <div class="pill">${regionLabel} area</div>
+            <div class="result-date">Date: ${escapeHtml(dateLabel)}</div>
+            <div class="pill">${escapeHtml(regionLabel)} area</div>
           </div>
           <div class="result-meta">
             <div><strong>County:</strong> ${escapeHtml(countyLabel)}</div>
-            <div><strong>Zone:</strong> ${displayZone}${typeof window.userLon !== 'number' ? ' (Zone A base – location not set)' : ''}</div>
+            <div><strong>Zone:</strong> ${escapeHtml(displayZone)}</div>
           </div>
           <div class="time-section">
             <div class="time-box">
@@ -659,12 +708,13 @@
             </div>
           </div>
           <div class="tiny">
-            Times are legal shooting hours for 2025, using Northern/Southern tables plus Zone ${displayZone} offset.
+            Times are legal shooting hours for 2025, using Northern/Southern tables plus Zone ${escapeHtml(displayZone)} offset.
           </div>
         </div>
       `;
 
-      scrollToResult();
+      openResultModal(cardHtml, lastLocationLabel);
+      elements.result.innerHTML = ''; // clear status when we have a real result
     }
 
     // -----------------------
@@ -691,7 +741,7 @@
         map.setZoom(10);
       }
 
-      // Reverse geocoding still via Nominatim to get county
+      // Reverse geocoding via Nominatim to get county
       try {
         const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
@@ -708,21 +758,26 @@
           }
         }
 
+        lastLocationLabel = elements.locationInput.value.trim() || lastLocationLabel;
+
         if (countyClean) {
           const match = COUNTY_LIST.find(c => c.toLowerCase() === countyClean.toLowerCase());
           if (match) {
-            elements.countySelect.value = match;
+            selectedCounty = match;
           }
           renderMessage(`Location set from ${sourceLabel}: ${escapeHtml(countyClean)} County.`);
         } else {
-          renderMessage(`Location set from ${sourceLabel}, but county could not be determined. Select it manually if needed.`);
+          selectedCounty = '';
+          renderMessage(`Location set from ${sourceLabel}, but county could not be determined. Times will use Southern area by default.`);
         }
       } catch (e) {
         console.error(e);
         if (!elements.locationInput.value) {
           elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
         }
-        renderMessage(`Location set from ${sourceLabel}, but reverse-geocoding failed. You can pick county manually.`);
+        lastLocationLabel = elements.locationInput.value.trim() || lastLocationLabel;
+        selectedCounty = '';
+        renderMessage(`Location set from ${sourceLabel}, but reverse-geocoding failed. Times will use Southern area by default.`);
       }
 
       computeTimes();
@@ -740,12 +795,12 @@
         await handleLocationChange(lat, lon, 'device location');
       }, (err) => {
         console.warn(err);
-        renderMessage('Geolocation was denied or failed. You can use the search box, map, or county selection instead.');
+        renderMessage('Geolocation was denied or failed. You can use the search box or map instead.');
       }, { timeout: 10000 });
     }
 
     // -----------------------
-    //  GOOGLE PLACES: AUTOCOMPLETE + SEARCH
+    //  GOOGLE PLACES: AUTOCOMPLETE
     // -----------------------
 
     function isPlaceInWisconsin(addressComponents) {
@@ -775,52 +830,9 @@
       if (place.formatted_address) {
         elements.locationInput.value = place.formatted_address;
       }
+      lastLocationLabel = elements.locationInput.value.trim() || lastLocationLabel;
 
       handleLocationChange(lat, lon, 'Google place');
-    }
-
-    function searchLocationText() {
-      const q = elements.locationInput.value.trim();
-      if (!q) {
-        renderMessage('Enter a city, ZIP, or address in Wisconsin to search.');
-        return;
-      }
-      if (!window.google || !map || !placesService) {
-        renderMessage('Map is still loading. Please wait a moment and try again.');
-        return;
-      }
-
-      const query = q + ', Wisconsin';
-      const request = {
-        query,
-        fields: ['geometry', 'formatted_address', 'address_components']
-      };
-
-      renderMessage('Searching Wisconsin locations…');
-
-      placesService.findPlaceFromQuery(request, (results, status) => {
-        if (status !== google.maps.places.PlacesServiceStatus.OK || !results || !results.length) {
-          renderMessage('No Wisconsin locations found for that search. Try a different city/ZIP/address.');
-          return;
-        }
-
-        const best = results[0];
-        if (!best.geometry || !best.geometry.location) {
-          renderMessage('Search result had invalid coordinates. Try a different search.');
-          return;
-        }
-
-        if (!isPlaceInWisconsin(best.address_components || [])) {
-          renderMessage('Please pick a location in Wisconsin.');
-          return;
-        }
-
-        const lat = best.geometry.location.lat();
-        const lon = best.geometry.location.lng();
-
-        elements.locationInput.value = best.formatted_address || query;
-        handleLocationChange(lat, lon, 'search');
-      });
     }
 
     // -----------------------
@@ -828,20 +840,17 @@
     // -----------------------
 
     function initMap() {
-      // Center on Wisconsin
       map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 44.5, lng: -89.5 },
         zoom: 6,
         mapTypeId: 'terrain'
       });
 
-      // Places service for "Go" searches
       placesService = new google.maps.places.PlacesService(map);
 
-      // Bias autocomplete to Wisconsin area
       const wiBounds = new google.maps.LatLngBounds(
-        { lat: 42.49, lng: -92.89 }, // SW-ish
-        { lat: 47.31, lng: -86.25 }  // NE-ish
+        { lat: 42.49, lng: -92.89 },
+        { lat: 47.31, lng: -86.25 }
       );
 
       const options = {
@@ -852,11 +861,10 @@
 
       autocomplete = new google.maps.places.Autocomplete(elements.locationInput, options);
       autocomplete.setBounds(wiBounds);
-      autocomplete.setOptions({ strictBounds: false }); // bias, not hard lock
+      autocomplete.setOptions({ strictBounds: false });
 
       autocomplete.addListener('place_changed', onPlaceSelected);
 
-      // Map click sets location
       map.addListener('click', async (e) => {
         const lat = e.latLng.lat();
         const lng = e.latLng.lng();
@@ -869,20 +877,24 @@
     // -----------------------
 
     document.addEventListener('DOMContentLoaded', () => {
-      populateCountyDropdown(elements.countySelect);
       elements.dateInput.value = isoDateForToday();
       loadCsvData();
 
       elements.btnUseLocation.addEventListener('click', useLocation);
-      elements.btnSearchLocation.addEventListener('click', searchLocationText);
-
       elements.dateInput.addEventListener('change', computeTimes);
-      elements.countySelect.addEventListener('change', computeTimes);
 
       elements.locationInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
+          // Let Google Autocomplete handle if a suggestion is selected;
+          // otherwise do nothing extra (user can pick from dropdown).
           e.preventDefault();
-          searchLocationText();
+        }
+      });
+
+      elements.modalClose.addEventListener('click', closeResultModal);
+      elements.resultModal.addEventListener('click', (e) => {
+        if (e.target === elements.resultModal) {
+          closeResultModal();
         }
       });
     });
@@ -896,7 +908,6 @@
   </script>
 </body>
 </html>
-
 
 
 
