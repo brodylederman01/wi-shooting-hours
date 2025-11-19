@@ -506,7 +506,10 @@
       return hr + ':' + mn.toString().padStart(2, '0');
     }
 
-    function formatTimeWithAmPm(timeStr) {
+    // AM/PM formatter:
+    //  - for AM side: infer normally
+    //  - for PM side: always label as PM (end of day)
+    function formatTimeWithAmPm(timeStr, forcePm = false) {
       if (!timeStr) return '';
       const parts = timeStr.split(':');
       if (parts.length < 2) return timeStr;
@@ -515,16 +518,34 @@
       if (isNaN(h) || isNaN(m)) return timeStr;
 
       let suffix = 'AM';
-      if (h === 0) {
-        h = 12;
-        suffix = 'AM';
-      } else if (h === 12) {
-        suffix = 'PM';
-      } else if (h > 12) {
-        h = h - 12;
-        suffix = 'PM';
+
+      if (forcePm) {
+        // Always show as PM for ending time
+        if (h === 0) {
+          h = 12;
+          suffix = 'PM';
+        } else if (h === 12) {
+          suffix = 'PM';
+        } else if (h > 12) {
+          h = h - 12;
+          suffix = 'PM';
+        } else {
+          // 1–11 -> same hour, PM
+          suffix = 'PM';
+        }
       } else {
-        suffix = h < 12 ? 'AM' : 'PM';
+        // Normal inference for start time
+        if (h === 0) {
+          h = 12;
+          suffix = 'AM';
+        } else if (h === 12) {
+          suffix = 'PM';
+        } else if (h > 12) {
+          h = h - 12;
+          suffix = 'PM';
+        } else {
+          suffix = h < 12 ? 'AM' : 'PM';
+        }
       }
 
       return `${h}:${m.toString().padStart(2,'0')} ${suffix}`;
@@ -631,8 +652,8 @@
       const adjAM = addMinutesToTime(row.am, offset);
       const adjPM = addMinutesToTime(row.pm, offset);
 
-      const displayAM = formatTimeWithAmPm(adjAM);
-      const displayPM = formatTimeWithAmPm(adjPM);
+      const displayAM = formatTimeWithAmPm(adjAM, false); // start (AM)
+      const displayPM = formatTimeWithAmPm(adjPM, true);  // end (always PM)
 
       const dateLabel = elements.dateInput.value || isoDateForToday();
       const countyLabel = county || '(county not selected)';
@@ -692,7 +713,6 @@
         const countyRaw = data?.address?.county || data?.address?.state_district || data?.address?.region;
         const countyClean = countyRaw ? String(countyRaw).replace(/\s*County$/i, '').trim() : '';
 
-        // Fill search bar with human-readable location
         if (data && data.display_name) {
           elements.locationInput.value = data.display_name;
         } else {
@@ -746,14 +766,12 @@
       renderMessage('Searching Wisconsin locations…');
 
       try {
-        // Only search within Wisconsin
         const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=10&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
         let data = await res.json();
 
         if (!Array.isArray(data)) data = [];
 
-        // Filter to Wisconsin results only
         const wiResults = data.filter(p => {
           const state = p.address && (p.address.state || p.address.state_code);
           if (!state) return false;
@@ -800,7 +818,6 @@
         let data = await res.json();
         if (!Array.isArray(data)) data = [];
 
-        // Keep only Wisconsin addresses
         const wiResults = data.filter(p => {
           const state = p.address && (p.address.state || p.address.state_code);
           if (!state) return false;
@@ -915,5 +932,3 @@
   </script>
 </body>
 </html>
-
-
