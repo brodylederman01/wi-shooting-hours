@@ -258,7 +258,7 @@
       left: 0;
       right: 0;
       top: calc(100% + 2px);
-      max-height: 220px;
+      max-height: 260px;
       overflow-y: auto;
       background: #020617;
       border-radius: 10px;
@@ -325,7 +325,6 @@
     <div class="card">
       <div class="row-inline" style="margin-bottom:8px;">
         <button id="btnUseLocation">📍 Use My Location</button>
-        <!-- Update button removed -->
       </div>
 
       <!-- SEARCH BY CITY / ZIP / ADDRESS with AUTOCOMPLETE -->
@@ -395,7 +394,6 @@
       "Wood"
     ];
 
-    // Northern vs Southern split
     const NORTHERN_COUNTY_SET = new Set([
       "Pierce","Dunn","Eau Claire","Clark","Marathon","Shawano","Oconto","Door",
       "Ashland","Barron","Bayfield","Chippewa","Douglas","Florence","Forest",
@@ -455,7 +453,6 @@
       return `${y}-${m}-${day}`;
     }
 
-    // Avoid time-zone issues with <input type="date">
     function getMonthDayKeyFromInput() {
       let val = elements.dateInput.value;
       if (!val) {
@@ -466,7 +463,7 @@
       const month = parseInt(parts[1], 10);
       const day   = parseInt(parts[2], 10);
       if (isNaN(month) || isNaN(day)) return null;
-      return `${month}/${day}`; // e.g. "11/18"
+      return `${month}/${day}`;
     }
 
     function escapeHtml(str) {
@@ -483,14 +480,13 @@
       if (typeof lon !== 'number' || isNaN(lon)) {
         return { zone: 'A', offset: 0 };
       }
-      const west = -lon; // -89 -> 89°W
+      const west = -lon;
       if (west < 88) return { zone: 'A', offset: 0 };
 
-      // 88–89 => B, 89–90 => C, 90–91 => D, 91–92 => E, >92 => F
-      const delta = Math.floor(west - 88); // 0 => B, 1 => C, ...
-      const idx = Math.min(Math.max(delta, 0), 4); // clamp B..F
+      const delta = Math.floor(west - 88);
+      const idx = Math.min(Math.max(delta, 0), 4);
       const zoneLetter = String.fromCharCode('B'.charCodeAt(0) + idx);
-      const offset = (idx + 1) * 4; // 4, 8, 12, 16, 20
+      const offset = (idx + 1) * 4;
       return { zone: zoneLetter, offset };
     }
 
@@ -510,8 +506,7 @@
       return hr + ':' + mn.toString().padStart(2, '0');
     }
 
-    // convert "HH:MM" (24h or 0-padded) to "h:MM AM/PM"
-    function formatTimeWithAmPm(timeStr, isPmLabel) {
+    function formatTimeWithAmPm(timeStr) {
       if (!timeStr) return '';
       const parts = timeStr.split(':');
       if (parts.length < 2) return timeStr;
@@ -532,9 +527,6 @@
         suffix = h < 12 ? 'AM' : 'PM';
       }
 
-      // If caller explicitly wants AM/PM label (AM for morning box, PM for evening),
-      // we can just trust suffix, but append AM/PM anyway.
-      // For clarity with your request, we always append AM or PM.
       return `${h}:${m.toString().padStart(2,'0')} ${suffix}`;
     }
 
@@ -552,9 +544,6 @@
         NORTHERN_DATA = parseCsvToMap(northText, true);
         SOUTHERN_DATA = parseCsvToMap(southText, false);
 
-        console.log('Northern rows:', Object.keys(NORTHERN_DATA).length);
-        console.log('Southern rows:', Object.keys(SOUTHERN_DATA).length);
-
         renderMessage('Data loaded. Set your location with the search box, map, or “Use My Location”.');
       } catch (e) {
         console.error(e);
@@ -562,7 +551,6 @@
       }
     }
 
-    // tolerant parser: first 3 columns = Date, AM, PM
     function parseCsvToMap(csvText, isNorthern) {
       const out = {};
       const lines = csvText.trim().split(/\r?\n/);
@@ -571,7 +559,7 @@
       let startIndex = 0;
       const firstCols = lines[0].split(',');
       if (firstCols[0].toLowerCase().includes('date')) {
-        startIndex = 1; // skip header row
+        startIndex = 1;
       }
 
       for (let i = startIndex; i < lines.length; i++) {
@@ -587,7 +575,6 @@
 
         if (!dateStr) continue;
 
-        // Ignore 1/1/2026 in Northern (per your sheet)
         if (isNorthern && String(dateStr).startsWith('1/1/2026')) continue;
 
         const parts = String(dateStr).split('/');
@@ -629,7 +616,6 @@
         return;
       }
 
-      // Zone: always auto from longitude if we have it; otherwise Zone A base table
       let displayZone = 'A';
       let offset = 0;
 
@@ -645,8 +631,8 @@
       const adjAM = addMinutesToTime(row.am, offset);
       const adjPM = addMinutesToTime(row.pm, offset);
 
-      const displayAM = formatTimeWithAmPm(adjAM, false);
-      const displayPM = formatTimeWithAmPm(adjPM, true);
+      const displayAM = formatTimeWithAmPm(adjAM);
+      const displayPM = formatTimeWithAmPm(adjPM);
 
       const dateLabel = elements.dateInput.value || isoDateForToday();
       const countyLabel = county || '(county not selected)';
@@ -664,12 +650,12 @@
           </div>
           <div class="time-section">
             <div class="time-box">
-              <div class="time-label">Legal Shooting Time (AM)</div>
+              <div class="time-label">Legal Shooting Start (AM)</div>
               <div class="time-value">${displayAM || '—'}</div>
               <div class="time-src">Base table: ${escapeHtml(row.am || '—')}</div>
             </div>
             <div class="time-box">
-              <div class="time-label">Legal Shooting Time (PM)</div>
+              <div class="time-label">Legal Shooting End (PM)</div>
               <div class="time-value">${displayPM || '—'}</div>
               <div class="time-src">Base table: ${escapeHtml(row.pm || '—')}</div>
             </div>
@@ -689,7 +675,6 @@
       window.userLat = lat;
       window.userLon = lon;
 
-      // Move marker & center map
       if (map) {
         if (!mapMarker) {
           mapMarker = L.marker([lat, lon]).addTo(map);
@@ -703,8 +688,16 @@
         const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
         const data = await res.json();
+
         const countyRaw = data?.address?.county || data?.address?.state_district || data?.address?.region;
         const countyClean = countyRaw ? String(countyRaw).replace(/\s*County$/i, '').trim() : '';
+
+        // Fill search bar with human-readable location
+        if (data && data.display_name) {
+          elements.locationInput.value = data.display_name;
+        } else {
+          elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        }
 
         if (countyClean) {
           const match = COUNTY_LIST.find(c => c.toLowerCase() === countyClean.toLowerCase());
@@ -717,6 +710,7 @@
         }
       } catch (e) {
         console.error(e);
+        elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
         renderMessage(`Location set from ${sourceLabel}, but reverse-geocoding failed. You can pick county manually.`);
       }
 
@@ -749,26 +743,30 @@
     }
 
     async function performSearchAndSetLocation(query, sourceLabel) {
-      renderMessage('Searching location…');
+      renderMessage('Searching Wisconsin locations…');
 
       try {
-        // Bias to Wisconsin, US, but still allow partial city names
-        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
-        let res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        // Only search within Wisconsin
+        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=10&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
+        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
         let data = await res.json();
 
-        if (!Array.isArray(data) || data.length === 0) {
-          const url2 = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&q=${encodeURIComponent(query)}`;
-          res = await fetch(url2, { headers: { 'Accept': 'application/json' } });
-          data = await res.json();
-        }
+        if (!Array.isArray(data)) data = [];
 
-        if (!Array.isArray(data) || data.length === 0) {
-          renderMessage('No results found for that search. Try a different city/ZIP/address.');
+        // Filter to Wisconsin results only
+        const wiResults = data.filter(p => {
+          const state = p.address && (p.address.state || p.address.state_code);
+          if (!state) return false;
+          const s = String(state).toLowerCase();
+          return s.includes('wisconsin') || s === 'wi';
+        });
+
+        if (!wiResults.length) {
+          renderMessage('No Wisconsin locations found for that search. Try a different city/ZIP/address.');
           return;
         }
 
-        const best = data[0];
+        const best = wiResults[0];
         const lat = parseFloat(best.lat);
         const lon = parseFloat(best.lon);
 
@@ -786,7 +784,7 @@
     }
 
     // -----------------------
-    //  AUTOCOMPLETE SUGGESTIONS (SIMPLER & MORE FORGIVING)
+    //  AUTOCOMPLETE SUGGESTIONS (UP TO 10, WI ONLY)
     // -----------------------
 
     async function fetchSuggestions(query) {
@@ -797,22 +795,26 @@
       }
 
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
+        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=10&countrycodes=us&q=${encodeURIComponent(query + ', Wisconsin')}`;
         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
         let data = await res.json();
+        if (!Array.isArray(data)) data = [];
 
-        if (!Array.isArray(data)) {
-          data = [];
-        }
+        // Keep only Wisconsin addresses
+        const wiResults = data.filter(p => {
+          const state = p.address && (p.address.state || p.address.state_code);
+          if (!state) return false;
+          const s = String(state).toLowerCase();
+          return s.includes('wisconsin') || s === 'wi';
+        });
 
-        if (!data.length) {
+        if (!wiResults.length) {
           elements.locationSuggestions.style.display = 'none';
           elements.locationSuggestions.innerHTML = '';
           return;
         }
 
-        // Don't filter by 'place' class anymore — show anything with a name
-        elements.locationSuggestions.innerHTML = data.map(p => {
+        elements.locationSuggestions.innerHTML = wiResults.map(p => {
           const label = p.display_name || p.name || '';
           if (!label) return '';
           return `<div class="suggestion-item"
@@ -861,7 +863,7 @@
     // -----------------------
 
     function initMap() {
-      map = L.map('map').setView([44.5, -89.5], 6); // Rough center of Wisconsin
+      map = L.map('map').setView([44.5, -89.5], 6);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; OpenStreetMap contributors'
@@ -889,7 +891,6 @@
       elements.dateInput.addEventListener('change', computeTimes);
       elements.countySelect.addEventListener('change', computeTimes);
 
-      // Autocomplete input
       elements.locationInput.addEventListener('input', () => {
         const q = elements.locationInput.value.trim();
         if (suggestionTimeout) clearTimeout(suggestionTimeout);
@@ -904,7 +905,6 @@
       elements.locationSuggestions.addEventListener('click', handleSuggestionClick);
       document.addEventListener('click', closeSuggestionsIfClickOutside);
 
-      // Press Enter to force a search (even if suggestions glitch)
       elements.locationInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
