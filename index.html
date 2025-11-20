@@ -154,7 +154,7 @@
       box-shadow: 0 10px 26px rgba(0,0,0,0.8);
     }
 
-    /* ====== RESULT AREA (for messages only) ====== */
+    /* ====== RESULT AREA ====== */
     #result {
       margin-top: 16px;
       font-size: 1rem;
@@ -349,7 +349,11 @@
     </div>
 
     <div class="card">
-      <div class="row-inline" style="margin-bottom:8px;">
+      <!-- HUNTING DATE AT TOP -->
+      <label for="dateInput">Hunting Date</label>
+      <input id="dateInput" type="date" />
+
+      <div class="row-inline" style="margin-bottom:8px; margin-top:10px;">
         <button id="btnUseLocation">📍 Use My Location</button>
       </div>
 
@@ -368,17 +372,13 @@
       <label>Pick exact location on map (optional)</label>
       <div id="map"></div>
 
-      <!-- DATE -->
-      <label for="dateInput">Date</label>
-      <input id="dateInput" type="date" />
-
-      <!-- Only used for status / errors, not the main result card -->
+      <!-- Status + underlying result card -->
       <div id="result"></div>
     </div>
 
     <div class="card tiny">
       <strong>How to use</strong><br>
-      1) Start typing a city or town in Wisconsin and pick from the dropdown, or click on the map, or use “My Location”.<br>
+      1) Choose your hunting date, then start typing a city or town in Wisconsin and pick from the dropdown, or click on the map, or use “My Location”.<br>
       2) The app will auto-detect county, area (Northern/Southern), and zone (A–F). You can still change the date manually.
     </div>
   </main>
@@ -469,6 +469,22 @@
       const m = String(d.getMonth() + 1).padStart(2,'0');
       const day = String(d.getDate()).padStart(2,'0');
       return `${y}-${m}-${day}`;
+    }
+
+    // Display date like "Nov 23, 2025"
+    function formatDisplayDate(isoStr) {
+      if (!isoStr) return '';
+      const parts = isoStr.split('-');
+      if (parts.length !== 3) return isoStr;
+      const [yStr, mStr, dStr] = parts;
+      const y = parseInt(yStr, 10);
+      const m = parseInt(mStr, 10);
+      const d = parseInt(dStr, 10);
+      if (isNaN(y) || isNaN(m) || isNaN(d)) return isoStr;
+
+      const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const monthName = monthNames[m - 1] || mStr;
+      return `${monthName} ${d}, ${y}`;
     }
 
     function getMonthDayKeyFromInput() {
@@ -594,7 +610,7 @@
         NORTHERN_DATA = parseCsvToMap(northText, true);
         SOUTHERN_DATA = parseCsvToMap(southText, false);
 
-        renderMessage('Data loaded. Set your location with the search box, map, or “Use My Location”.');
+        renderMessage('Data loaded. Choose your hunting date, then set your location with the search box, map, or “Use My Location”.');
       } catch (e) {
         console.error(e);
         renderMessage('Error loading shooting hours data. Make sure the two CSV files are in the same folder as index.html.');
@@ -681,14 +697,15 @@
       const displayAM = formatTimeWithAmPm(adjAM, false);
       const displayPM = formatTimeWithAmPm(adjPM, true);
 
-      const dateLabel = elements.dateInput.value || isoDateForToday();
+      const iso = elements.dateInput.value || isoDateForToday();
+      const dateDisplay = formatDisplayDate(iso);
       const countyLabel = county || '(county not detected)';
       const regionLabel = region.charAt(0).toUpperCase() + region.slice(1);
 
       const cardHtml = `
         <div class="result-card">
           <div class="result-header">
-            <div class="result-date">Date: ${escapeHtml(dateLabel)}</div>
+            <div class="result-date">Date: ${escapeHtml(dateDisplay)}</div>
             <div class="pill">${escapeHtml(regionLabel)} area</div>
           </div>
           <div class="result-meta">
@@ -713,8 +730,11 @@
         </div>
       `;
 
+      // Show result underneath the form
+      elements.result.innerHTML = cardHtml;
+
+      // Also show the same result in the popup
       openResultModal(cardHtml, lastLocationLabel);
-      elements.result.innerHTML = ''; // clear status when we have a real result
     }
 
     // -----------------------
@@ -741,7 +761,7 @@
         map.setZoom(10);
       }
 
-      // Reverse geocoding via Nominatim to get county
+      // Reverse geocoding via Nominatim to get county and a nice label
       try {
         const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
@@ -750,12 +770,11 @@
         const countyRaw = data?.address?.county || data?.address?.state_district || data?.address?.region;
         const countyClean = countyRaw ? String(countyRaw).replace(/\s*County$/i, '').trim() : '';
 
-        if (!elements.locationInput.value) {
-          if (data && data.display_name) {
-            elements.locationInput.value = data.display_name;
-          } else {
-            elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-          }
+        // ALWAYS override the search box with this location
+        if (data && data.display_name) {
+          elements.locationInput.value = data.display_name;
+        } else {
+          elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
         }
 
         lastLocationLabel = elements.locationInput.value.trim() || lastLocationLabel;
@@ -772,10 +791,11 @@
         }
       } catch (e) {
         console.error(e);
-        if (!elements.locationInput.value) {
-          elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-        }
+
+        // On error, still override with lat/lon string
+        elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
         lastLocationLabel = elements.locationInput.value.trim() || lastLocationLabel;
+
         selectedCounty = '';
         renderMessage(`Location set from ${sourceLabel}, but reverse-geocoding failed. Times will use Southern area by default.`);
       }
@@ -885,9 +905,7 @@
 
       elements.locationInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-          // Let Google Autocomplete handle if a suggestion is selected;
-          // otherwise do nothing extra (user can pick from dropdown).
-          e.preventDefault();
+          e.preventDefault(); // let autocomplete selection drive behavior
         }
       });
 
