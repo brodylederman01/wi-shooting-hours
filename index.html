@@ -5,7 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WI Deer Hunting Shooting Hours</title>
 
-  <!-- No Leaflet CSS needed with Google Maps -->
+  <!-- Google Search Console Verification -->
+  <meta name="google-site-verification" content="lq8goJQCY-Cp5OBHYNHgv83SNaifNaJg-93DDb4MsvM" />
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y09NFZ3SH7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y09NFZ3SH7');
+  </script>
 
   <style>
     /* ====== GLOBAL LAYOUT & THEME ====== */
@@ -15,70 +25,76 @@
       margin: 0 auto;
       padding: 20px 16px 40px;
       background:
-        radial-gradient(circle at top, rgba(15,118,110,0.45), transparent 55%),
-        radial-gradient(circle at bottom, rgba(113,63,18,0.4), transparent 60%),
+        radial-gradient(circle at 15% 0%, rgba(74,222,128,0.08), transparent 55%),
+        radial-gradient(circle at 85% 20%, rgba(190,242,100,0.06), transparent 60%),
+        radial-gradient(circle at 0% 80%, rgba(21,128,61,0.25), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(15,118,110,0.25), transparent 55%),
         #020617;
       color: #e5e7eb;
     }
     main {
-      margin-top: 16px;
+      margin-top: 18px;
     }
 
     /* ====== HEADER / BRANDING ====== */
     .site-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
+      gap: 14px;
+      padding: 14px 18px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #14532d, #166534);
+      background: linear-gradient(120deg, #022c22, #065f46);
       color: #ecfdf5;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.7);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.7);
       position: sticky;
       top: 10px;
       z-index: 20;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(16,185,129,0.25);
     }
     .logo-mark {
-      width: 38px;
-      height: 38px;
+      width: 46px;
+      height: 46px;
       border-radius: 999px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 30% 20%, #facc15, #b45309);
-      font-size: 1.6rem;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.7);
+      background: radial-gradient(circle at 50% 30%, #020617, #052e16);
+      font-size: 2.1rem;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.85);
+      border: 2px solid #f97316;
     }
     .site-title {
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      font-size: 1.15rem;
       text-transform: uppercase;
     }
     .site-subtitle {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       opacity: 0.9;
     }
 
     h1.page-heading {
-      font-size: 1.65rem;
-      margin: 14px 0 4px;
+      font-size: 2.25rem;
+      margin: 18px 0 6px;
       color: #f9fafb;
+      letter-spacing: 0.03em;
     }
     .muted {
       color: #9ca3af;
       font-size: 0.9rem;
       margin-bottom: 1rem;
+      max-width: 640px;
     }
 
     /* ====== CARDS / CONTAINERS ====== */
     .card {
-      background: radial-gradient(circle at top left, #111827, #020617);
-      border-radius: 18px;
-      padding: 16px 16px 18px;
-      box-shadow: 0 18px 42px rgba(0,0,0,0.85);
-      margin-top: 12px;
+      background: radial-gradient(circle at top left, #020617, #022c22);
+      border-radius: 20px;
+      padding: 18px 18px 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+      margin-top: 14px;
       border: 1px solid rgba(148,163,184,0.25);
     }
 
@@ -95,13 +111,22 @@
     input[type="text"] {
       width: 100%;
       box-sizing: border-box;
-      padding: 8px 10px;
+      padding: 9px 11px;
       margin-top: 4px;
       border-radius: 10px;
       border: 1px solid #374151;
       font-size: 0.95rem;
       background: #020617;
       color: #e5e7eb;
+      outline: none;
+      box-shadow: 0 0 0 0 rgba(16,185,129,0.25);
+      transition: box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+    input[type="date"]:focus,
+    input[type="text"]:focus {
+      border-color: #16a34a;
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.45);
+      background: #020a06;
     }
     input::placeholder {
       color: #6b7280;
@@ -110,10 +135,10 @@
     /* ====== BUTTONS ====== */
     button {
       margin-top: 8px;
-      padding: 9px 14px;
+      padding: 9px 16px;
       border-radius: 999px;
       border: none;
-      background: #f97316; /* hunter orange */
+      background: linear-gradient(135deg, #f97316, #fb923c); /* hunter orange */
       color: #111827;
       font-weight: 600;
       font-size: 0.95rem;
@@ -121,21 +146,21 @@
       display: inline-flex;
       gap: 6px;
       align-items: center;
-      box-shadow: 0 10px 28px rgba(249,115,22,0.6);
-      transition: transform 0.06s ease, box-shadow 0.06s ease, opacity 0.15s ease;
+      box-shadow: 0 12px 32px rgba(249,115,22,0.7);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.15s ease;
     }
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 12px 32px rgba(249,115,22,0.7);
+      box-shadow: 0 16px 40px rgba(249,115,22,0.8);
     }
     button.secondary {
-      background: #111827;
+      background: linear-gradient(135deg, #020617, #020617);
       color: #e5e7eb;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.7);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.8);
       border: 1px solid #1f2937;
     }
     button.small {
-      padding: 7px 10px;
+      padding: 7px 12px;
       font-size: 0.85rem;
     }
     button:disabled {
@@ -150,25 +175,97 @@
       width: 100%;
       height: 260px;
       margin-top: 10px;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
       border: 1px solid #1f2937;
-      box-shadow: 0 10px 26px rgba(0,0,0,0.8);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.9);
     }
 
-    /* ====== RESULT CARD ====== */
+    /* ====== RESULT AREA ====== */
     #result {
       margin-top: 16px;
       font-size: 1rem;
     }
+
+    .tiny {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
+    .row-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .suggestions {
+      position: relative;
+      width: 100%;
+    }
+
+    /* ====== MODAL / POPUP ====== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal {
+      background: radial-gradient(circle at top, #020617, #022c22);
+      border-radius: 20px;
+      padding: 18px 18px 16px;
+      max-width: 420px;
+      width: calc(100% - 32px);
+      box-shadow: 0 24px 68px rgba(0,0,0,0.95);
+      border: 1px solid rgba(148,163,184,0.4);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: none;
+      padding: 4px;
+      margin-top: 0;
+    }
+    .modal-close:hover {
+      color: #e5e7eb;
+      transform: none;
+      box-shadow: none;
+    }
+    .modal-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    .modal-location {
+      display: block;
+      margin-top: 2px;
+      font-size: 1.05rem;
+      color: #f9fafb;
+      font-weight: 600;
+    }
+
     .result-card {
       margin-top: 10px;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 12px 12px 14px;
-      background: radial-gradient(circle at top, #0b1120, #020617);
+      background: radial-gradient(circle at top, #020617, #031b0f);
       border: 1px solid rgba(148,163,184,0.4);
       box-shadow: 0 16px 44px rgba(0,0,0,0.9);
-      scroll-margin-top: 90px; /* helps when scrolling into view under sticky header */
     }
     .result-header {
       display: flex;
@@ -223,31 +320,12 @@
       font-size: 1.5rem;
       font-weight: 700;
       margin-top: 4px;
-      color: #facc15; /* sunrise/yellow */
+      color: #facc15;
     }
     .time-src {
       font-size: 0.8rem;
       color: #6b7280;
       margin-top: 2px;
-    }
-    .tiny {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      margin-top: 6px;
-    }
-
-    .row-inline {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-top: 4px;
-    }
-
-    /* ====== AUTOCOMPLETE WRAPPER (no custom dropdown now) ====== */
-    .suggestions {
-      position: relative;
-      width: 100%;
     }
 
     /* ====== FOOTER ====== */
@@ -278,6 +356,9 @@
       .time-section {
         flex-direction: column;
       }
+      h1.page-heading {
+        font-size: 1.9rem;
+      }
     }
   </style>
 </head>
@@ -298,7 +379,11 @@
     </div>
 
     <div class="card">
-      <div class="row-inline" style="margin-bottom:8px;">
+      <!-- HUNTING DATE AT TOP -->
+      <label for="dateInput">Hunting Date</label>
+      <input id="dateInput" type="date" />
+
+      <div class="row-inline" style="margin-bottom:8px; margin-top:10px;">
         <button id="btnUseLocation">📍 Use My Location</button>
       </div>
 
@@ -311,31 +396,20 @@
           placeholder="Start typing a WI city or town (e.g. Eau Claire, Madison)…"
           style="flex:1; min-width: 180px;"
         />
-        <!-- "Go" button triggers a Places query if user doesn't pick from dropdown -->
-        <button id="btnSearchLocation" class="secondary small">Go</button>
       </div>
 
       <!-- MAP PICKER -->
       <label>Pick exact location on map (optional)</label>
       <div id="map"></div>
 
-      <!-- COUNTY DROPDOWN -->
-      <label for="countySelect">County</label>
-      <select id="countySelect">
-        <option value="">Select county…</option>
-      </select>
-
-      <!-- DATE -->
-      <label for="dateInput">Date</label>
-      <input id="dateInput" type="date" />
-
+      <!-- Status + underlying result card -->
       <div id="result"></div>
     </div>
 
     <div class="card tiny">
       <strong>How to use</strong><br>
-      1) Start typing a city or town in Wisconsin and pick from the dropdown, or click on the map, or use “My Location”.<br>
-      2) The app will auto-detect county, area (Northern/Southern), and zone (A–F). You can still change county or date manually.
+      1) Choose your hunting date, then start typing a city or town in Wisconsin and pick from the dropdown, or click on the map, or use “My Location”.<br>
+      2) The app will auto-detect county, area (Northern/Southern), and zone (A–F).
     </div>
   </main>
 
@@ -345,6 +419,14 @@
       Built for hunters to quickly check today’s hours at <span class="footer-domain">WIHuntingHours.com</span>.
     </div>
   </footer>
+
+  <!-- RESULT MODAL -->
+  <div id="resultModal" class="modal-backdrop">
+    <div class="modal">
+      <button class="modal-close" type="button" aria-label="Close">✕</button>
+      <div id="resultModalContent"></div>
+    </div>
+  </div>
 
   <script>
     // -----------------------
@@ -373,15 +455,6 @@
       "Taylor","Vilas","Washburn","Burnett","Polk"
     ]);
 
-    function populateCountyDropdown(selectEl) {
-      COUNTY_LIST.forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        selectEl.appendChild(opt);
-      });
-    }
-
     function determineRegionFromCounty(countyName) {
       if (!countyName) return "southern";
       const normalized = countyName.replace(/county$/i, "").trim();
@@ -403,16 +476,18 @@
     window.userLat = null;
     window.userLon = null;
 
+    let selectedCounty = '';
+    let lastLocationLabel = '';
+
     const elements = {
       btnUseLocation: document.getElementById('btnUseLocation'),
       locationInput: document.getElementById('locationInput'),
-      btnSearchLocation: document.getElementById('btnSearchLocation'),
-      countySelect: document.getElementById('countySelect'),
       dateInput: document.getElementById('dateInput'),
-      result: document.getElementById('result')
+      result: document.getElementById('result'),
+      resultModal: document.getElementById('resultModal'),
+      resultModalContent: document.getElementById('resultModalContent'),
+      modalClose: document.querySelector('.modal-close')
     };
-
-    let suggestionTimeout = null; // leftover var, not used now but harmless
 
     // -----------------------
     //  UTILITIES
@@ -424,6 +499,22 @@
       const m = String(d.getMonth() + 1).padStart(2,'0');
       const day = String(d.getDate()).padStart(2,'0');
       return `${y}-${m}-${day}`;
+    }
+
+    // Display date like "Nov 23, 2025"
+    function formatDisplayDate(isoStr) {
+      if (!isoStr) return '';
+      const parts = isoStr.split('-');
+      if (parts.length !== 3) return isoStr;
+      const [yStr, mStr, dStr] = parts;
+      const y = parseInt(yStr, 10);
+      const m = parseInt(mStr, 10);
+      const d = parseInt(dStr, 10);
+      if (isNaN(y) || isNaN(m) || isNaN(d)) return isoStr;
+
+      const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const monthName = monthNames[m - 1] || mStr;
+      return `${monthName} ${d}, ${y}`;
     }
 
     function getMonthDayKeyFromInput() {
@@ -479,9 +570,6 @@
       return hr + ':' + mn.toString().padStart(2, '0');
     }
 
-    // AM/PM formatter:
-    //  - for AM side: infer normally
-    //  - for PM side: always label as PM (end of day)
     function formatTimeWithAmPm(timeStr, forcePm = false) {
       if (!timeStr) return '';
       const parts = timeStr.split(':');
@@ -521,11 +609,21 @@
       return `${h}:${m.toString().padStart(2,'0')} ${suffix}`;
     }
 
-    // Smooth scroll to results
-    function scrollToResult() {
-      if (!elements.result) return;
-      const card = elements.result.querySelector('.result-card') || elements.result;
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Modal helpers
+    function openResultModal(innerHtml, locationLabel) {
+      const safeLocation = locationLabel ? escapeHtml(locationLabel) : 'Selected Location';
+      elements.resultModalContent.innerHTML = `
+        <div class="modal-title">
+          Shooting Hours For
+          <span class="modal-location">${safeLocation}</span>
+        </div>
+        ${innerHtml}
+      `;
+      elements.resultModal.style.display = 'flex';
+    }
+
+    function closeResultModal() {
+      elements.resultModal.style.display = 'none';
     }
 
     // -----------------------
@@ -542,7 +640,7 @@
         NORTHERN_DATA = parseCsvToMap(northText, true);
         SOUTHERN_DATA = parseCsvToMap(southText, false);
 
-        renderMessage('Data loaded. Set your location with the search box, map, or “Use My Location”.');
+        renderMessage('Data loaded. Choose your hunting date, then set your location with the search box, map, or “Use My Location”.');
       } catch (e) {
         console.error(e);
         renderMessage('Error loading shooting hours data. Make sure the two CSV files are in the same folder as index.html.');
@@ -597,7 +695,7 @@
         return;
       }
 
-      const county = elements.countySelect.value;
+      const county = selectedCounty;
       const region = determineRegionFromCounty(county);
 
       const key = getMonthDayKeyFromInput();
@@ -621,30 +719,28 @@
         const auto = computeZoneFromLon(window.userLon);
         displayZone = auto.zone;
         offset = auto.offset;
-      } else {
-        displayZone = 'A';
-        offset = 0;
       }
 
       const adjAM = addMinutesToTime(row.am, offset);
       const adjPM = addMinutesToTime(row.pm, offset);
 
-      const displayAM = formatTimeWithAmPm(adjAM, false); // start (AM)
-      const displayPM = formatTimeWithAmPm(adjPM, true);  // end (always PM)
+      const displayAM = formatTimeWithAmPm(adjAM, false);
+      const displayPM = formatTimeWithAmPm(adjPM, true);
 
-      const dateLabel = elements.dateInput.value || isoDateForToday();
-      const countyLabel = county || '(county not selected)';
+      const iso = elements.dateInput.value || isoDateForToday();
+      const dateDisplay = formatDisplayDate(iso);
+      const countyLabel = county || '(county not detected)';
       const regionLabel = region.charAt(0).toUpperCase() + region.slice(1);
 
-      elements.result.innerHTML = `
+      const cardHtml = `
         <div class="result-card">
           <div class="result-header">
-            <div class="result-date">Date: ${dateLabel}</div>
-            <div class="pill">${regionLabel} area</div>
+            <div class="result-date">Date: ${escapeHtml(dateDisplay)}</div>
+            <div class="pill">${escapeHtml(regionLabel)} area</div>
           </div>
           <div class="result-meta">
             <div><strong>County:</strong> ${escapeHtml(countyLabel)}</div>
-            <div><strong>Zone:</strong> ${displayZone}${typeof window.userLon !== 'number' ? ' (Zone A base – location not set)' : ''}</div>
+            <div><strong>Zone:</strong> ${escapeHtml(displayZone)}</div>
           </div>
           <div class="time-section">
             <div class="time-box">
@@ -659,12 +755,16 @@
             </div>
           </div>
           <div class="tiny">
-            Times are legal shooting hours for 2025, using Northern/Southern tables plus Zone ${displayZone} offset.
+            Times are legal shooting hours for 2025, using Northern/Southern tables plus Zone ${escapeHtml(displayZone)} offset.
           </div>
         </div>
       `;
 
-      scrollToResult();
+      // Show result underneath the form
+      elements.result.innerHTML = cardHtml;
+
+      // Also show the same result in the popup
+      openResultModal(cardHtml, lastLocationLabel);
     }
 
     // -----------------------
@@ -691,7 +791,7 @@
         map.setZoom(10);
       }
 
-      // Reverse geocoding still via Nominatim to get county
+      // Reverse geocoding via Nominatim to get county and a nice label
       try {
         const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1`;
         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
@@ -700,31 +800,37 @@
         const countyRaw = data?.address?.county || data?.address?.state_district || data?.address?.region;
         const countyClean = countyRaw ? String(countyRaw).replace(/\s*County$/i, '').trim() : '';
 
-        if (!elements.locationInput.value) {
-          if (data && data.display_name) {
-            elements.locationInput.value = data.display_name;
-          } else {
-            elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-          }
+        // ALWAYS override the search box with this location
+        if (data && data.display_name) {
+          elements.locationInput.value = data.display_name;
+        } else {
+          elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
         }
+
+        lastLocationLabel = elements.locationInput.value.trim() || lastLocationLabel;
 
         if (countyClean) {
           const match = COUNTY_LIST.find(c => c.toLowerCase() === countyClean.toLowerCase());
           if (match) {
-            elements.countySelect.value = match;
+            selectedCounty = match;
           }
           renderMessage(`Location set from ${sourceLabel}: ${escapeHtml(countyClean)} County.`);
         } else {
-          renderMessage(`Location set from ${sourceLabel}, but county could not be determined. Select it manually if needed.`);
+          selectedCounty = '';
+          renderMessage(`Location set from ${sourceLabel}, but county could not be determined. Times will use Southern area by default.`);
         }
       } catch (e) {
         console.error(e);
-        if (!elements.locationInput.value) {
-          elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-        }
-        renderMessage(`Location set from ${sourceLabel}, but reverse-geocoding failed. You can pick county manually.`);
+
+        // On error, still override with lat/lon string
+        elements.locationInput.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        lastLocationLabel = elements.locationInput.value.trim() || lastLocationLabel;
+
+        selectedCounty = '';
+        renderMessage(`Location set from ${sourceLabel}, but reverse-geocoding failed. Times will use Southern area by default.`);
       }
 
+      // Recalculate times ONLY when a location is set/changed
       computeTimes();
     }
 
@@ -740,12 +846,12 @@
         await handleLocationChange(lat, lon, 'device location');
       }, (err) => {
         console.warn(err);
-        renderMessage('Geolocation was denied or failed. You can use the search box, map, or county selection instead.');
+        renderMessage('Geolocation was denied or failed. You can use the search box or map instead.');
       }, { timeout: 10000 });
     }
 
     // -----------------------
-    //  GOOGLE PLACES: AUTOCOMPLETE + SEARCH
+    //  GOOGLE PLACES: AUTOCOMPLETE
     // -----------------------
 
     function isPlaceInWisconsin(addressComponents) {
@@ -775,52 +881,10 @@
       if (place.formatted_address) {
         elements.locationInput.value = place.formatted_address;
       }
+      lastLocationLabel = elements.locationInput.value.trim() || lastLocationLabel;
 
+      // Location selection triggers calculation
       handleLocationChange(lat, lon, 'Google place');
-    }
-
-    function searchLocationText() {
-      const q = elements.locationInput.value.trim();
-      if (!q) {
-        renderMessage('Enter a city, ZIP, or address in Wisconsin to search.');
-        return;
-      }
-      if (!window.google || !map || !placesService) {
-        renderMessage('Map is still loading. Please wait a moment and try again.');
-        return;
-      }
-
-      const query = q + ', Wisconsin';
-      const request = {
-        query,
-        fields: ['geometry', 'formatted_address', 'address_components']
-      };
-
-      renderMessage('Searching Wisconsin locations…');
-
-      placesService.findPlaceFromQuery(request, (results, status) => {
-        if (status !== google.maps.places.PlacesServiceStatus.OK || !results || !results.length) {
-          renderMessage('No Wisconsin locations found for that search. Try a different city/ZIP/address.');
-          return;
-        }
-
-        const best = results[0];
-        if (!best.geometry || !best.geometry.location) {
-          renderMessage('Search result had invalid coordinates. Try a different search.');
-          return;
-        }
-
-        if (!isPlaceInWisconsin(best.address_components || [])) {
-          renderMessage('Please pick a location in Wisconsin.');
-          return;
-        }
-
-        const lat = best.geometry.location.lat();
-        const lon = best.geometry.location.lng();
-
-        elements.locationInput.value = best.formatted_address || query;
-        handleLocationChange(lat, lon, 'search');
-      });
     }
 
     // -----------------------
@@ -828,20 +892,17 @@
     // -----------------------
 
     function initMap() {
-      // Center on Wisconsin
       map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 44.5, lng: -89.5 },
         zoom: 6,
         mapTypeId: 'terrain'
       });
 
-      // Places service for "Go" searches
       placesService = new google.maps.places.PlacesService(map);
 
-      // Bias autocomplete to Wisconsin area
       const wiBounds = new google.maps.LatLngBounds(
-        { lat: 42.49, lng: -92.89 }, // SW-ish
-        { lat: 47.31, lng: -86.25 }  // NE-ish
+        { lat: 42.49, lng: -92.89 },
+        { lat: 47.31, lng: -86.25 }
       );
 
       const options = {
@@ -852,11 +913,10 @@
 
       autocomplete = new google.maps.places.Autocomplete(elements.locationInput, options);
       autocomplete.setBounds(wiBounds);
-      autocomplete.setOptions({ strictBounds: false }); // bias, not hard lock
+      autocomplete.setOptions({ strictBounds: false });
 
       autocomplete.addListener('place_changed', onPlaceSelected);
 
-      // Map click sets location
       map.addListener('click', async (e) => {
         const lat = e.latLng.lat();
         const lng = e.latLng.lng();
@@ -869,20 +929,24 @@
     // -----------------------
 
     document.addEventListener('DOMContentLoaded', () => {
-      populateCountyDropdown(elements.countySelect);
       elements.dateInput.value = isoDateForToday();
       loadCsvData();
 
       elements.btnUseLocation.addEventListener('click', useLocation);
-      elements.btnSearchLocation.addEventListener('click', searchLocationText);
 
-      elements.dateInput.addEventListener('change', computeTimes);
-      elements.countySelect.addEventListener('change', computeTimes);
+      // IMPORTANT: no automatic computeTimes on date change anymore.
+      // User must click "Use My Location" or select a place / map location.
 
       elements.locationInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-          e.preventDefault();
-          searchLocationText();
+          e.preventDefault(); // let autocomplete selection drive behavior
+        }
+      });
+
+      elements.modalClose.addEventListener('click', closeResultModal);
+      elements.resultModal.addEventListener('click', (e) => {
+        if (e.target === elements.resultModal) {
+          closeResultModal();
         }
       });
     });
@@ -896,6 +960,7 @@
   </script>
 </body>
 </html>
+
 
 
 
