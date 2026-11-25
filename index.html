@@ -25,6 +25,10 @@
 </style>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9385773359000306" crossorigin="anonymous"></script>
   <style>.site-footer a,.guide a{color:#86efac}.guide h2{font-size:1.2rem}.guide h3{font-size:1rem}.guide p{line-height:1.6;color:#d1d5db}</style>
+<style>
+body{font-size:17px}.site-title{font-size:19px}.header-nav{font-size:15px}.hero{padding:24px 0 18px}.page-heading{margin:0 0 6px}.muted{font-size:16px}.card{padding:22px}.tool-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:24px}.section-heading,label{font-size:18px;font-weight:700;line-height:1.35;margin:0 0 9px}.location-heading{margin:20px 0 10px}label[for=locationInput]{font-size:16px;margin-bottom:7px}input[type=date],input[type=text]{min-height:52px;font-size:18px;border-color:#718274}#btnUseLocation{min-height:56px;font-size:19px;margin-top:0}.or{font-size:15px;margin:12px 0}.tiny,.legal-note{font-size:14px;line-height:1.5;color:#c4cec3}.local-suggestions button{min-height:50px;font-size:17px}#map{height:350px}.map-panel .section-heading{margin-bottom:10px}#result{margin-top:18px;padding-top:14px}.time-label{font-size:16px;font-weight:650}.time-value{font-size:clamp(28px,5vw,42px);letter-spacing:-.04em}.result-date,.result-meta{font-size:16px}.pill{font-size:14px}.modal-close{width:44px;height:44px;font-size:20px}.modal-location{font-size:20px}.modal-title{padding-right:48px}.help-section{margin:0 0 22px}.help-item{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:10px 0}.help-item>summary{font-size:18px;font-weight:700;padding:15px 18px}.help-item summary,.result-details summary,.data-credits summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}.help-item summary::-webkit-details-marker,.result-details summary::-webkit-details-marker,.data-credits summary::-webkit-details-marker{display:none}.help-item summary::after,.result-details summary::after,.data-credits summary::after{content:'+';font-size:23px;color:var(--green);flex:none}.help-item[open]>summary::after,.help-item details[open]>summary::after,.result-details[open]>summary::after,.data-credits[open]>summary::after{content:'−'}summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}.help-content{padding:0 18px 16px;color:#d4ded2}.help-content ol{margin:0;padding-left:24px}.help-content li{padding:4px 0}.faq-list details{border-top:1px solid var(--line)}.faq-list summary{font-weight:650;padding:9px 0;font-size:16px}.faq-list p,.result-details p{margin:0 0 12px;line-height:1.6}.result-details{margin-top:8px;color:var(--muted);font-size:14px}.result-details summary{justify-content:flex-start}.site-footer{font-size:14px}.site-footer nav{gap:12px}.data-credits{max-width:650px}.data-credits summary{justify-content:flex-start}.data-credits .site-footer-small{margin:0 0 12px}
+@media(max-width:700px){body{padding:14px 12px 26px}.hero{padding:18px 0 15px}.card{padding:15px}.tool-grid{grid-template-columns:1fr;gap:19px}#map{height:230px}.time-value{font-size:clamp(24px,7vw,34px)}.time-label{font-size:14px}.result-meta{font-size:14px}.modal{padding:16px}.help-item>summary{padding:12px 15px}.site-title{font-size:17px}}@media(max-width:350px){.time-section{grid-template-columns:1fr}.time-value{font-size:34px}}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#tool">Skip to shooting hours</a>
@@ -35,31 +39,32 @@
     </div>
     <div>
       <div class="site-title">WI HUNTING HOURS</div>
-      <div class="site-subtitle">Check legal shooting times by exact location</div>
+      
     </div>
     <nav class="header-nav" aria-label="Main navigation"><a href="about.html">About</a><a href="#guide-heading">Hunting hours guide</a><a href="https://dnr.wisconsin.gov/topic/hunt">WI DNR</a></nav>
   </header>
 
   <main>
-    <div class="hero"><div class="eyebrow">Wisconsin · Hunting reference</div>
+    <div class="hero">
     <h1 class="page-heading">2026 Shooting Hours</h1>
     <div class="muted">
-      Deer, bear, small game, and fall turkey — Northern/Southern areas with automatic longitude zones (A–F).
+      Deer, bear, small game and fall turkey.
     </div>
 
     </div>
-    <section class="card" id="tool" aria-label="Shooting hours calculator"><div class="tool-grid"><div class="controls"><div class="step">01 / Date &amp; location</div><h2 class="section-heading">Find your shooting hours</h2>
+    <section class="card" id="tool" aria-label="Shooting hours calculator"><div class="tool-grid"><div class="controls">
       <!-- HUNTING DATE AT TOP -->
-      <label for="dateInput">Hunting Date</label>
+      <label for="dateInput">1. Choose a date</label>
       <input id="dateInput" type="date" />
 
-      <div class="row-inline" style="margin-bottom:8px; margin-top:10px;">
+      <h2 class="section-heading location-heading">2. Set your location</h2>
+      <div class="row-inline">
         <button id="btnUseLocation">📍 Use My Location</button>
       </div>
 
-      <div class="or">or search</div>
+      <div class="or">or</div>
       <!-- LOCAL LOCATION SEARCH -->
-      <label for="locationInput">City / Town / ZIP (in Wisconsin)</label>
+      <label for="locationInput">Search by city or ZIP code</label>
       <div class="row-inline suggestions">
         <input
           id="locationInput" autocomplete="off" aria-label="Wisconsin city, town or ZIP code"
@@ -70,24 +75,28 @@
         <div id="localSuggestions" class="local-suggestions" hidden></div>
       </div>
 
-      <div class="tiny">City and ZIP results are approximate. Use GPS or a map pin for exact hunting location.</div>
-      </div><div class="map-panel"><div class="step">02 / Map</div><h2 class="section-heading">Pin your hunting spot</h2>
-      <div id="map" aria-label="Interactive Wisconsin map"></div><p class="tiny map-note">Tap the map to select your exact location.</p></div></div>
+      <div class="tiny">City and ZIP results are approximate. Use GPS or the map for exact location.</div>
+      </div><div class="map-panel"><h2 class="section-heading">Or tap the map</h2>
+      <div id="map" aria-label="Interactive Wisconsin map"></div></div></div>
 
       <!-- Status + underlying result card -->
-      <div id="result" aria-live="polite"></div><div class="legal-note">Always confirm legal shooting hours and season regulations with the Wisconsin DNR.</div>
+      <div id="result" aria-live="polite"></div><div class="legal-note">Confirm hours and season rules with the <a href="https://dnr.wisconsin.gov/topic/hunt">Wisconsin DNR</a>.</div>
     </section>
 
-    <section class="card how"><h2>How it works</h2><p>Choose your hunting date, then use your device location, search for a Wisconsin city or ZIP, or select a point on the map. The tool determines your county, northern or southern area, and longitude zone.</p></section>
-  <section class="card guide" aria-labelledby="guide-heading"><h2 id="guide-heading">Understanding Wisconsin hunting hours</h2><div class="faq-grid"><article><h3>Why do shooting hours vary by location?</h3><p>Wisconsin publishes hunting-hour tables for northern and southern areas, with geographic time adjustments. This tool uses the selected county and longitude to choose the applicable table and zone. Legal shooting hours are not necessarily the same as sunrise and sunset.</p></article><article><h3>Which location should I choose?</h3><p>Use My Location at your hunting spot or select the exact spot on the map. City and ZIP search results represent approximate locations, which may fall on a different side of a county or zone boundary from your stand.</p></article><article><h3>Can I check a future hunting date?</h3><p>Choose the date first, then select your hunting location. Confirm that the date is covered by the current official tables and that the season, species and hunting method are permitted.</p></article><article><h3>What if my location cannot be verified?</h3><p>Try a nearby point within Wisconsin or search for a city or ZIP code. Do not rely on an unverified location for legal hunting times. Consult the <a href="https://dnr.wisconsin.gov/topic/hunt">Wisconsin DNR hunting regulations</a> before hunting.</p></article></div></section>
+    <section class="help-section" aria-label="Help and information">
+      <details class="help-item" id="guide-heading"><summary>How to use</summary><div class="help-content"><ol><li>Choose your hunting date.</li><li>Use your location, search a city or ZIP, or tap the map.</li><li>Read your legal start and end times.</li></ol></div></details>
+      <details class="help-item"><summary>Frequently asked questions</summary><div class="help-content faq-list">
+        <details><summary>Why do hours vary by location?</summary><p>Wisconsin uses northern and southern tables with longitude-based adjustments. Legal shooting hours are not necessarily sunrise and sunset.</p></details>
+        <details><summary>Which location should I choose?</summary><p>Use GPS at your hunting spot or tap its exact location on the map. City and ZIP results are approximate and may be across a county or zone boundary.</p></details>
+        <details><summary>Can I check a future date?</summary><p>Choose a date, then select your location again. Confirm the date is covered by the official tables and that your season, species and method are permitted.</p></details>
+        <details><summary>What if my location cannot be verified?</summary><p>Try another point inside Wisconsin or search a city or ZIP. Do not rely on an unverified location. Check the <a href="https://dnr.wisconsin.gov/topic/hunt">Wisconsin DNR regulations</a>.</p></details>
+      </div></details>
+    </section>
 </main>
 
   <footer class="site-footer">
-    <div>Always confirm regulations with the official Wisconsin DNR before hunting.</div>
-    <div class="site-footer-small">
-      Built for hunters to quickly check today’s hours at <span class="footer-domain">WIHuntingHours.com</span>.
-    </div>
-    <div class="site-footer-small">Location data: <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html">U.S. Census TIGER/Line</a> and <a href="https://www.geonames.org/">GeoNames</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>), filtered to Wisconsin.</div>
+
+    <details class="data-credits"><summary>Map and location data</summary><div class="site-footer-small">Location data: <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html">U.S. Census TIGER/Line</a> and <a href="https://www.geonames.org/">GeoNames</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>), filtered to Wisconsin.</div></details>
   <nav class="site-footer-small" aria-label="Site information"><a href="about.html">About</a> · <a href="privacy.html">Privacy Policy</a> · <a href="https://dnr.wisconsin.gov/topic/hunt">Wisconsin DNR</a></nav>
 </footer>
 
@@ -314,7 +323,7 @@
         NORTHERN_DATA = parseCsvToMap(northText, true);
         SOUTHERN_DATA = parseCsvToMap(southText, false);
 
-        if(locationVersion===0) renderMessage('Data loaded. Choose your hunting date, then set your location with the search box, map, or “Use My Location”.');
+        if(locationVersion===0) renderMessage('Select a location to see shooting hours.');
       } catch (e) {
         console.error(e);
         renderMessage('Error loading shooting hours data. Make sure the two CSV files are in the same folder as index.html.');
@@ -422,19 +431,15 @@
           </div>
           <div class="time-section">
             <div class="time-box">
-              <div class="time-label">Legal Shooting Start (AM)</div>
+              <div class="time-label">Shooting starts</div>
               <div class="time-value">${displayAM || '—'}</div>
-              <div class="time-src">Base table: ${escapeHtml(row.am || '—')}</div>
             </div>
             <div class="time-box">
-              <div class="time-label">Legal Shooting End (PM)</div>
+              <div class="time-label">Shooting ends</div>
               <div class="time-value">${displayPM || '—'}</div>
-              <div class="time-src">Base table: ${escapeHtml(row.pm || '—')}</div>
             </div>
           </div>
-          <div class="tiny">
-            Times use the supplied Northern/Southern tables plus Zone ${escapeHtml(displayZone)} offset.
-          </div>
+          <details class="result-details"><summary>Calculation details</summary><p>Base table: ${escapeHtml(row.am || '—')} / ${escapeHtml(row.pm || '—')}. ${escapeHtml(regionLabel)} area, Zone ${escapeHtml(displayZone)} adjustment: ${offset} minutes.</p></details>
         </div>
       `;
 
