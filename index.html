@@ -20,364 +20,14 @@
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <style>
-    /* ====== GLOBAL LAYOUT & THEME ====== */
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 20px 16px 40px;
-      background:
-        radial-gradient(circle at 15% 0%, rgba(74,222,128,0.08), transparent 55%),
-        radial-gradient(circle at 85% 20%, rgba(190,242,100,0.06), transparent 60%),
-        radial-gradient(circle at 0% 80%, rgba(21,128,61,0.25), transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(15,118,110,0.25), transparent 55%),
-        #020617;
-      color: #e5e7eb;
-    }
-    main {
-      margin-top: 18px;
-    }
-
-    /* ====== HEADER / BRANDING ====== */
-    .site-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 18px;
-      border-radius: 999px;
-      background: linear-gradient(120deg, #022c22, #065f46);
-      color: #ecfdf5;
-      box-shadow: 0 18px 50px rgba(0,0,0,0.7);
-      position: sticky;
-      top: 10px;
-      z-index: 20;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(16,185,129,0.25);
-    }
-    .logo-mark {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at 50% 30%, #020617, #052e16);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.85);
-      border: 1px solid #0f172a;
-      overflow: hidden; /* ensures the image is cropped to a circle */
-    }
-    .logo-mark img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;  /* fill the circle, cropping edges if needed */
-      border-radius: 50%;
-      display: block;
-    }
-    .site-title {
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      font-size: 1.15rem;
-      text-transform: uppercase;
-    }
-    .site-subtitle {
-      font-size: 0.82rem;
-      opacity: 0.9;
-    }
-
-    h1.page-heading {
-      font-size: 2.25rem;
-      margin: 18px 0 6px;
-      color: #f9fafb;
-      letter-spacing: 0.03em;
-    }
-    .muted {
-      color: #9ca3af;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-      max-width: 640px;
-    }
-
-    /* ====== CARDS / CONTAINERS ====== */
-    .card {
-      background: radial-gradient(circle at top left, #020617, #022c22);
-      border-radius: 20px;
-      padding: 18px 18px 20px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-      margin-top: 14px;
-      border: 1px solid rgba(148,163,184,0.25);
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: #e5e7eb;
-    }
-
-    input[type="date"],
-    select,
-    input[type="text"] {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 9px 11px;
-      margin-top: 4px;
-      border-radius: 10px;
-      border: 1px solid #374151;
-      font-size: 0.95rem;
-      background: #020617;
-      color: #e5e7eb;
-      outline: none;
-      box-shadow: 0 0 0 0 rgba(16,185,129,0.25);
-      transition: box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
-    }
-    input[type="date"]:focus,
-    input[type="text"]:focus {
-      border-color: #16a34a;
-      box-shadow: 0 0 0 1px rgba(34,197,94,0.45);
-      background: #020a06;
-    }
-    input::placeholder {
-      color: #6b7280;
-    }
-
-    /* ====== BUTTONS ====== */
-    button {
-      margin-top: 8px;
-      padding: 9px 16px;
-      border-radius: 999px;
-      border: none;
-      background: linear-gradient(135deg, #f97316, #fb923c); /* hunter orange */
-      color: #111827;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: inline-flex;
-      gap: 6px;
-      align-items: center;
-      box-shadow: 0 12px 32px rgba(249,115,22,0.7);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.15s ease;
-    }
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 40px rgba(249,115,22,0.8);
-    }
-    button.secondary {
-      background: linear-gradient(135deg, #020617, #020617);
-      color: #e5e7eb;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.8);
-      border: 1px solid #1f2937;
-    }
-    button.small {
-      padding: 7px 12px;
-      font-size: 0.85rem;
-    }
-    button:disabled {
-      opacity: 0.6;
-      cursor: default;
-      transform: none;
-      box-shadow: none;
-    }
-
-    /* ====== MAP ====== */
-    #map {
-      width: 100%;
-      height: 260px;
-      margin-top: 10px;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid #1f2937;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.9);
-    }
-
-    /* ====== RESULT AREA ====== */
-    #result {
-      margin-top: 16px;
-      font-size: 1rem;
-    }
-
-    .tiny {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      margin-top: 6px;
-    }
-
-    .row-inline {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-top: 4px;
-    }
-
-    .suggestions {
-      position: relative;
-      width: 100%;
-    }
-
-    .local-suggestions { position:absolute; top:100%; left:0; right:0; z-index:25; max-height:240px; overflow:auto; background:#020617; border:1px solid #374151; border-radius:10px; }
-    .local-suggestions button { display:block; width:100%; text-align:left; margin:0; border-radius:0; background:transparent; color:#e5e7eb; box-shadow:none; font-weight:400; }
-    .local-suggestions button:hover, .local-suggestions button:focus { background:#14532d; transform:none; }
-    .local-suggestions[hidden] { display:none; }
-    /* ====== MODAL / POPUP ====== */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(2,6,23,0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-    }
-    .modal {
-      background: radial-gradient(circle at top, #020617, #022c22);
-      border-radius: 20px;
-      padding: 18px 18px 16px;
-      max-width: 420px;
-      width: calc(100% - 32px);
-      box-shadow: 0 24px 68px rgba(0,0,0,0.95);
-      border: 1px solid rgba(148,163,184,0.4);
-      position: relative;
-    }
-    .modal-close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: transparent;
-      border: none;
-      color: #9ca3af;
-      font-size: 1.1rem;
-      cursor: pointer;
-      box-shadow: none;
-      padding: 4px;
-      margin-top: 0;
-    }
-    .modal-close:hover {
-      color: #e5e7eb;
-      transform: none;
-      box-shadow: none;
-    }
-    .modal-title {
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: #9ca3af;
-      margin-bottom: 4px;
-    }
-    .modal-location {
-      display: block;
-      margin-top: 2px;
-      font-size: 1.05rem;
-      color: #f9fafb;
-      font-weight: 600;
-    }
-
-    .result-card {
-      margin-top: 10px;
-      border-radius: 16px;
-      padding: 12px 12px 14px;
-      background: radial-gradient(circle at top, #020617, #031b0f);
-      border: 1px solid rgba(148,163,184,0.4);
-      box-shadow: 0 16px 44px rgba(0,0,0,0.9);
-    }
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .result-date {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #f9fafb;
-    }
-    .pill {
-      display: inline-block;
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      background: #064e3b;
-      color: #bbf7d0;
-      border: 1px solid rgba(34,197,94,0.4);
-    }
-    .result-meta {
-      margin-top: 6px;
-      font-size: 0.9rem;
-      color: #e5e7eb;
-    }
-    .result-meta strong {
-      font-weight: 600;
-    }
-
-    .time-section {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .time-box {
-      flex: 1;
-      min-width: 160px;
-      background: radial-gradient(circle at top, #020617, #030712);
-      border-radius: 12px;
-      padding: 9px 11px;
-      border: 1px solid #374151;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.85);
-    }
-    .time-label {
-      font-size: 0.85rem;
-      color: #9ca3af;
-    }
-    .time-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-top: 4px;
-      color: #facc15;
-    }
-    .time-src {
-      font-size: 0.8rem;
-      color: #6b7280;
-      margin-top: 2px;
-    }
-
-    /* ====== FOOTER ====== */
-    .site-footer {
-      margin-top: 20px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(148,163,184,0.3);
-      font-size: 0.8rem;
-      color: #9ca3af;
-    }
-    .site-footer-small {
-      margin-top: 4px;
-      font-size: 0.78rem;
-    }
-    .footer-domain {
-      color: #f97316;
-      font-weight: 600;
-    }
-
-    @media (max-width: 700px) {
-      body {
-        max-width: 100%;
-        padding: 16px 10px 32px;
-      }
-      .site-header {
-        border-radius: 16px;
-      }
-      .time-section {
-        flex-direction: column;
-      }
-      h1.page-heading {
-        font-size: 1.9rem;
-      }
-    }
-  </style>
+:root{color-scheme:dark;--bg:#101813;--panel:#18231c;--line:#344339;--ink:#f4f5ed;--muted:#b0bdb1;--accent:#ffb568;--green:#b5d3a9}*{box-sizing:border-box}body{max-width:1120px;margin:auto;padding:24px 24px 36px;background:radial-gradient(ellipse at 80% 0%,#233b2a 0%,transparent 48%),#101813;color:var(--ink);font:15px/1.55 system-ui,-apple-system,sans-serif}a{color:var(--green);text-underline-offset:4px}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}.site-header{display:flex;align-items:center;gap:12px;padding:0 0 20px;border-bottom:1px solid var(--line)}.logo-mark{width:46px;height:46px;border-radius:50%;overflow:hidden;background:#253d2b;flex:none}.logo-mark img{width:100%;height:100%;object-fit:cover}.site-title{font-size:17px;font-weight:800;letter-spacing:.04em}.site-subtitle{color:var(--muted);font-size:12px}.header-nav{margin-left:auto;display:flex;gap:24px;font-size:13px}.header-nav a{text-decoration:none}.hero{padding:32px 0 24px}.eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:700}.page-heading{font-size:clamp(32px,5vw,49px);line-height:1.08;letter-spacing:-.045em;margin:8px 0 10px}.muted{color:var(--muted);max-width:670px;margin:0;font-size:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:20px}.tool-grid{display:grid;grid-template-columns:minmax(0, .8fr) minmax(0,1.2fr);gap:24px;align-items:start}.section-heading{font-size:18px;margin:0 0 14px;letter-spacing:-.02em}.step{font-size:12px;font-weight:700;color:var(--green);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}input[type=date],input[type=text]{width:100%;min-width:0;background:#101a14;color:var(--ink);border:1px solid #46564a;border-radius:9px;padding:12px;min-height:46px;font-size:16px}input::placeholder{color:#9baa9e}#btnUseLocation{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:48px;border:0;border-radius:9px;background:var(--accent);color:#26180b;font-weight:800;margin-top:16px}#btnUseLocation:hover{background:#ffc68d}.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin:14px 0}.or:before,.or:after{content:'';height:1px;background:var(--line);flex:1}.tiny{font-size:12px;line-height:1.6;color:var(--muted);margin-top:8px}.suggestions{position:relative}.local-suggestions{position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:25;max-height:240px;overflow:auto;background:#142018;border:1px solid #526557;border-radius:10px;box-shadow:0 10px 25px #0005}.local-suggestions[hidden]{display:none}.local-suggestions button{display:block;width:100%;text-align:left;background:none;color:var(--ink);border:0;border-bottom:1px solid var(--line);padding:12px}.local-suggestions button:hover,.local-suggestions button:focus{background:#2c4432}#map{height:292px;width:100%;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#25382b}.map-note{margin:7px 0 0}.maplibregl-ctrl-attrib a{color:#333}.maplibregl-ctrl-attrib{color:#333}#result{margin-top:20px;border-top:1px solid var(--line);padding-top:16px}#result>.tiny{margin:0}.result-card{border:1px solid #435647;background:#111c15;border-radius:12px;padding:16px}.result-header{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.result-date{font-weight:750;font-size:15px}.pill{background:#2b4431;color:#d4ebc9;border-radius:20px;padding:4px 10px;font-size:12px}.result-meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:9px 0}.time-section{display:grid;grid-template-columns:1fr 1fr;gap:10px}.time-box{background:#1e3022;border:1px solid #344b38;border-radius:10px;padding:13px;min-width:0}.time-label{font-size:12px;color:#d0dbce}.time-value{font-size:clamp(23px,4vw,34px);font-weight:800;letter-spacing:-.05em;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}.time-src{font-size:11px;color:var(--muted)}.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#08100bd9;z-index:100;padding:16px}.modal{width:100%;max-width:490px;max-height:90dvh;overflow:auto;position:relative;background:var(--panel);border:1px solid #506353;border-radius:18px;padding:24px;box-shadow:0 18px 80px #0008}.modal-close{position:absolute;right:12px;top:12px;border:1px solid var(--line);border-radius:50%;width:36px;height:36px;background:#26372b;color:var(--ink)}.modal-title{font-size:12px;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-right:36px;margin-bottom:16px}.modal-location{display:block;font-size:18px;color:var(--ink);text-transform:none;letter-spacing:0;font-weight:700;overflow-wrap:anywhere;margin-top:5px}.guide h2,.how h2{margin:0 0 12px;font-size:21px}.guide h3{font-size:15px;margin:0 0 6px}.guide p,.how p{color:var(--muted);margin:0;line-height:1.65}.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 32px}.faq-grid article{border-top:1px solid var(--line);padding-top:15px}.how{display:grid;grid-template-columns:1fr 2fr;gap:20px;align-items:center}.how h2{margin:0}.site-footer{border-top:1px solid var(--line);padding-top:20px;font-size:12px;color:var(--muted)}.site-footer-small{margin-top:9px}.footer-domain{color:var(--green)}.site-footer nav{display:flex;gap:18px;flex-wrap:wrap}.legal-note{border-left:3px solid var(--accent);padding-left:10px;margin-top:12px;color:var(--muted);font-size:12px}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:15px;top:15px;background:var(--panel);padding:10px;z-index:200}
+@media(max-width:700px){body{padding:15px 14px 28px}.site-header{padding-bottom:14px}.header-nav{display:none}.hero{padding:23px 0 18px}.card{padding:16px;border-radius:14px;margin-bottom:14px}.tool-grid,.faq-grid,.how{grid-template-columns:1fr;gap:17px}#map{height:220px}.section-heading{margin-bottom:8px}.modal{padding:18px}.time-box{padding:9px}.time-value{font-size:clamp(20px,6vw,29px)}.time-label{font-size:11px}.result-card{padding:12px}.site-subtitle{font-size:11px}}
+</style>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9385773359000306" crossorigin="anonymous"></script>
   <style>.site-footer a,.guide a{color:#86efac}.guide h2{font-size:1.2rem}.guide h3{font-size:1rem}.guide p{line-height:1.6;color:#d1d5db}</style>
 </head>
 <body>
+<a class="skip-link" href="#tool">Skip to shooting hours</a>
   <!-- HEADER -->
   <header class="site-header">
     <div class="logo-mark">
@@ -387,15 +37,18 @@
       <div class="site-title">WI HUNTING HOURS</div>
       <div class="site-subtitle">Check legal shooting times by exact location</div>
     </div>
+    <nav class="header-nav" aria-label="Main navigation"><a href="about.html">About</a><a href="#guide-heading">Hunting hours guide</a><a href="https://dnr.wisconsin.gov/topic/hunt">WI DNR</a></nav>
   </header>
 
   <main>
+    <div class="hero"><div class="eyebrow">Wisconsin · Hunting reference</div>
     <h1 class="page-heading">2026 Shooting Hours</h1>
     <div class="muted">
       Deer, bear, small game, and fall turkey — Northern/Southern areas with automatic longitude zones (A–F).
     </div>
 
-    <div class="card">
+    </div>
+    <section class="card" id="tool" aria-label="Shooting hours calculator"><div class="tool-grid"><div class="controls"><div class="step">01 / Date &amp; location</div><h2 class="section-heading">Find your shooting hours</h2>
       <!-- HUNTING DATE AT TOP -->
       <label for="dateInput">Hunting Date</label>
       <input id="dateInput" type="date" />
@@ -404,33 +57,29 @@
         <button id="btnUseLocation">📍 Use My Location</button>
       </div>
 
+      <div class="or">or search</div>
       <!-- LOCAL LOCATION SEARCH -->
       <label for="locationInput">City / Town / ZIP (in Wisconsin)</label>
       <div class="row-inline suggestions">
         <input
           id="locationInput" autocomplete="off" aria-label="Wisconsin city, town or ZIP code"
           type="text"
-          placeholder="Start typing a WI city or town (e.g. Eau Claire, Madison)…"
-          style="flex:1; min-width: 180px;"
+          placeholder="City, town or ZIP code"
+          
         />
         <div id="localSuggestions" class="local-suggestions" hidden></div>
       </div>
 
       <div class="tiny">City and ZIP results are approximate. Use GPS or a map pin for exact hunting location.</div>
-      <!-- MAP PICKER -->
-      <label>Pick exact location on map (optional)</label>
-      <div id="map"></div>
+      </div><div class="map-panel"><div class="step">02 / Map</div><h2 class="section-heading">Pin your hunting spot</h2>
+      <div id="map" aria-label="Interactive Wisconsin map"></div><p class="tiny map-note">Tap the map to select your exact location.</p></div></div>
 
       <!-- Status + underlying result card -->
-      <div id="result"></div>
-    </div>
+      <div id="result" aria-live="polite"></div><div class="legal-note">Always confirm legal shooting hours and season regulations with the Wisconsin DNR.</div>
+    </section>
 
-    <div class="card tiny">
-      <strong>How to use</strong><br>
-      1) Choose your hunting date, then start typing a city or town in Wisconsin and pick from the dropdown, or click on the map, or use “My Location”.<br>
-      2) The app will auto-detect county, area (Northern/Southern), and zone (A–F).
-    </div>
-  <section class="card guide" aria-labelledby="guide-heading"><h2 id="guide-heading">Understanding Wisconsin hunting hours</h2><h3>Why do shooting hours vary by location?</h3><p>Wisconsin publishes hunting-hour tables for northern and southern areas, with geographic time adjustments. This tool uses the selected county and longitude to choose the applicable table and zone. Legal shooting hours are not necessarily the same as sunrise and sunset.</p><h3>Which location should I choose?</h3><p>Use My Location at your hunting spot or select the exact spot on the map. City and ZIP search results represent approximate locations, which may fall on a different side of a county or zone boundary from your stand.</p><h3>Can I check a future hunting date?</h3><p>Choose the date first, then select your hunting location. Confirm that the date is covered by the current official tables and that the season, species and hunting method are permitted.</p><h3>What if my location cannot be verified?</h3><p>Try a nearby point within Wisconsin or search for a city or ZIP code. Do not rely on an unverified location for legal hunting times. Consult the <a href="https://dnr.wisconsin.gov/topic/hunt">Wisconsin DNR hunting regulations</a> before hunting.</p></section>
+    <section class="card how"><h2>How it works</h2><p>Choose your hunting date, then use your device location, search for a Wisconsin city or ZIP, or select a point on the map. The tool determines your county, northern or southern area, and longitude zone.</p></section>
+  <section class="card guide" aria-labelledby="guide-heading"><h2 id="guide-heading">Understanding Wisconsin hunting hours</h2><div class="faq-grid"><article><h3>Why do shooting hours vary by location?</h3><p>Wisconsin publishes hunting-hour tables for northern and southern areas, with geographic time adjustments. This tool uses the selected county and longitude to choose the applicable table and zone. Legal shooting hours are not necessarily the same as sunrise and sunset.</p></article><article><h3>Which location should I choose?</h3><p>Use My Location at your hunting spot or select the exact spot on the map. City and ZIP search results represent approximate locations, which may fall on a different side of a county or zone boundary from your stand.</p></article><article><h3>Can I check a future hunting date?</h3><p>Choose the date first, then select your hunting location. Confirm that the date is covered by the current official tables and that the season, species and hunting method are permitted.</p></article><article><h3>What if my location cannot be verified?</h3><p>Try a nearby point within Wisconsin or search for a city or ZIP code. Do not rely on an unverified location for legal hunting times. Consult the <a href="https://dnr.wisconsin.gov/topic/hunt">Wisconsin DNR hunting regulations</a> before hunting.</p></article></div></section>
 </main>
 
   <footer class="site-footer">
@@ -444,7 +93,7 @@
 
   <!-- RESULT MODAL -->
   <div id="resultModal" class="modal-backdrop">
-    <div class="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Shooting hours results">
       <button class="modal-close" type="button" aria-label="Close">✕</button>
       <div id="resultModalContent"></div>
     </div>
@@ -921,6 +570,7 @@
       document.addEventListener('click',e=>{if(!e.target.closest('.suggestions')){searchVersion++;hideSuggestions();}});
 
       elements.modalClose.addEventListener('click', closeResultModal);
+      document.addEventListener('keydown', e => { if(e.key === 'Escape' && elements.resultModal.style.display === 'flex') closeResultModal(); });
       elements.resultModal.addEventListener('click', (e) => {
         if (e.target === elements.resultModal) {
           closeResultModal();
