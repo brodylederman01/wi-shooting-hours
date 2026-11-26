@@ -29,6 +29,13 @@
 body{font-size:17px}.site-title{font-size:19px}.header-nav{font-size:15px}.hero{padding:24px 0 18px}.page-heading{margin:0 0 6px}.muted{font-size:16px}.card{padding:22px}.tool-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:24px}.section-heading,label{font-size:18px;font-weight:700;line-height:1.35;margin:0 0 9px}.location-heading{margin:20px 0 10px}label[for=locationInput]{font-size:16px;margin-bottom:7px}input[type=date],input[type=text]{min-height:52px;font-size:18px;border-color:#718274}#btnUseLocation{min-height:56px;font-size:19px;margin-top:0}.or{font-size:15px;margin:12px 0}.tiny,.legal-note{font-size:14px;line-height:1.5;color:#c4cec3}.local-suggestions button{min-height:50px;font-size:17px}#map{height:350px}.map-panel .section-heading{margin-bottom:10px}#result{margin-top:18px;padding-top:14px}.time-label{font-size:16px;font-weight:650}.time-value{font-size:clamp(28px,5vw,42px);letter-spacing:-.04em}.result-date,.result-meta{font-size:16px}.pill{font-size:14px}.modal-close{width:44px;height:44px;font-size:20px}.modal-location{font-size:20px}.modal-title{padding-right:48px}.help-section{margin:0 0 22px}.help-item{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:10px 0}.help-item>summary{font-size:18px;font-weight:700;padding:15px 18px}.help-item summary,.result-details summary,.data-credits summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}.help-item summary::-webkit-details-marker,.result-details summary::-webkit-details-marker,.data-credits summary::-webkit-details-marker{display:none}.help-item summary::after,.result-details summary::after,.data-credits summary::after{content:'+';font-size:23px;color:var(--green);flex:none}.help-item[open]>summary::after,.help-item details[open]>summary::after,.result-details[open]>summary::after,.data-credits[open]>summary::after{content:'−'}summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}.help-content{padding:0 18px 16px;color:#d4ded2}.help-content ol{margin:0;padding-left:24px}.help-content li{padding:4px 0}.faq-list details{border-top:1px solid var(--line)}.faq-list summary{font-weight:650;padding:9px 0;font-size:16px}.faq-list p,.result-details p{margin:0 0 12px;line-height:1.6}.result-details{margin-top:8px;color:var(--muted);font-size:14px}.result-details summary{justify-content:flex-start}.site-footer{font-size:14px}.site-footer nav{gap:12px}.data-credits{max-width:650px}.data-credits summary{justify-content:flex-start}.data-credits .site-footer-small{margin:0 0 12px}
 @media(max-width:700px){body{padding:14px 12px 26px}.hero{padding:18px 0 15px}.card{padding:15px}.tool-grid{grid-template-columns:1fr;gap:19px}#map{height:230px}.time-value{font-size:clamp(24px,7vw,34px)}.time-label{font-size:14px}.result-meta{font-size:14px}.modal{padding:16px}.help-item>summary{padding:12px 15px}.site-title{font-size:17px}}@media(max-width:350px){.time-section{grid-template-columns:1fr}.time-value{font-size:34px}}
 </style>
+<style>
+.ad-placement{margin:24px 0;min-width:0;min-height:116px;text-align:center;padding:8px 0;}
+.ad-label{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.ad-placement .adsbygoogle{display:block;min-width:0;width:100%;}
+.ad-placement:has(.adsbygoogle[data-ad-status="unfilled"]){display:none;}
+@media(max-width:700px){.ad-placement{margin:24px 0;min-height:116px;}}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#tool">Skip to shooting hours</a>
@@ -83,6 +90,20 @@ body{font-size:17px}.site-title{font-size:19px}.header-nav{font-size:15px}.hero{
       <div id="result" aria-live="polite"></div><div class="legal-note">Confirm hours and season rules with the <a href="https://dnr.wisconsin.gov/topic/hunt">Wisconsin DNR</a>.</div>
     </section>
 
+    <!-- Hunting Hours - Main Display -->
+    <aside class="ad-placement" aria-label="Advertisement">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-9385773359000306"
+           data-ad-slot="5898256449"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>
+        try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (error) { console.warn('Ad unavailable', error); }
+      </script>
+    </aside>
+
     <section class="help-section" aria-label="Help and information">
       <details class="help-item" id="guide-heading"><summary>How to use</summary><div class="help-content"><ol><li>Choose your hunting date.</li><li>Use your location, search a city or ZIP, or tap the map.</li><li>Read your legal start and end times.</li></ol></div></details>
       <details class="help-item"><summary>Frequently asked questions</summary><div class="help-content faq-list">
@@ -92,6 +113,19 @@ body{font-size:17px}.site-title{font-size:19px}.header-nav{font-size:15px}.hero{
         <details><summary>What if my location cannot be verified?</summary><p>Try another point inside Wisconsin or search a city or ZIP. Do not rely on an unverified location. Check the <a href="https://dnr.wisconsin.gov/topic/hunt">Wisconsin DNR regulations</a>.</p></details>
       </div></details>
     </section>
+    <!-- Hunting Hours - Footer Display -->
+    <aside class="ad-placement" aria-label="Advertisement">
+      <div class="ad-label">Advertisement</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-9385773359000306"
+           data-ad-slot="2401543760"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>
+        try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (error) { console.warn('Ad unavailable', error); }
+      </script>
+    </aside>
 </main>
 
   <footer class="site-footer">
